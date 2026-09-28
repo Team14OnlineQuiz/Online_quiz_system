@@ -1,0 +1,49 @@
+@startuml sequence_admin_login
+title Sequence - UC-02 Admin Login (with lockout)
+autonumber
+
+actor Administrator as A
+participant "UI Controller" as UI
+participant "Auth Manager" as AM
+participant "Storage Manager" as SM
+participant "Error Handler" as EH
+database "admin.cfg" as CF
+
+A -> UI : select "2 Administrator Login"
+UI -> AM : lockRemainingSeconds()
+AM --> UI : secs
+
+alt secs > 0 (SEC-03)
+  UI -> EH : message(ERR_LOCKED, secs)
+  EH --> UI : "Too many failed attempts. Try again in N s."
+  UI --> A : show message, return to main menu
+else not locked
+  UI -> A : "Username:"
+  A -> UI : username
+  UI -> A : "Password:" (no echo, SEC-04)
+  A -> UI : password
+  UI -> AM : login(username, password, session)
+  AM -> SM : readCredentials(cred)
+  SM -> CF : read
+  CF --> SM : username, salt, hash
+  SM --> AM : Status
+
+  alt config unreadable
+    AM --> UI : ERR_IO (fail closed)
+    UI --> A : "Admin configuration unavailable."
+  else config loaded
+    AM -> AM : h = sha256(salt + password)\ncompare user and hash (constant time)
+    alt match (SEC-01)
+      AM -> AM : failures = 0
+      AM --> UI : OK (session.isAdmin() == true)
+      UI --> A : show admin menu
+    else mismatch (SEC-02)
+      AM -> AM : failures++\nif failures >= 3: lockedUntil = now + 60 s
+      AM --> UI : ERR_AUTH_FAILED
+      UI -> EH : message(ERR_AUTH_FAILED)
+      EH --> UI : "Invalid credentials"
+      UI --> A : show message (+ lock notice if locked), return to main menu
+    end
+  end
+end
+@enduml

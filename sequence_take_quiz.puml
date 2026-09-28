@@ -1,0 +1,60 @@
+@startuml sequence_take_quiz
+title Sequence - UC-01 Take Quiz
+autonumber
+
+actor Participant as P
+participant "UI Controller" as UI
+participant "Input Validator" as IV
+participant "Quiz Manager" as QM
+participant "Question Manager" as QSM
+participant "Score Calculator" as SC
+participant "Error Handler" as EH
+
+P -> UI : select "1 Take Quiz"
+UI -> QM : checkAvailable()
+QM -> QSM : count()
+QSM --> QM : n
+
+alt n == 0 (FR-16)
+  QM --> UI : ERR_EMPTY_BANK
+  UI -> EH : message(ERR_EMPTY_BANK)
+  EH --> UI : "No questions available"
+  UI --> P : show message, return to main menu
+else n > 0
+  QM --> UI : OK
+  loop until name is valid (FR-01)
+    UI -> P : "Enter your name:"
+    P -> UI : name
+    UI -> IV : validateName(name)
+    IV --> UI : Status
+    opt Status != OK
+      UI --> P : name error message
+    end
+  end
+  UI -> QM : startQuiz(name, quiz)
+  QM -> QSM : quizSet(10)
+  QSM --> QM : questions (max 10, stored order)
+  QM --> UI : OK
+
+  loop for each question (FR-03)
+    UI --> P : display question, options A-D
+    loop until valid answer (FR-04, FR-05)
+      P -> UI : answer
+      UI -> IV : validateAnswer(answer, letter)
+      IV --> UI : Status
+      opt Status == ERR_INVALID_OPTION
+        UI --> P : "Invalid option"
+      end
+    end
+    UI -> QM : submitAnswer(quiz, letter)
+    QM --> UI : AnswerResult(correct, keyLetter)
+    UI --> P : "Correct!" or "Wrong! Correct answer: X" (FR-06)
+  end
+
+  UI -> QM : result(quiz)
+  QM -> SC : calculate(questions, answers)
+  SC --> QM : score
+  QM --> UI : QuizResult(name, score, total)
+  UI --> P : show name and "score/total" (FR-07, FR-08)
+end
+@enduml

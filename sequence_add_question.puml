@@ -1,0 +1,50 @@
+@startuml sequence_add_question
+title Sequence - UC-03 Add Question (authorization, validation, persistence)
+autonumber
+
+actor Administrator as A
+participant "UI Controller" as UI
+participant "Input Validator" as IV
+participant "Question Manager" as QSM
+participant "Storage Manager" as SM
+participant "Error Handler" as EH
+database "questions.txt" as QF
+
+A -> UI : select "1 Add" (admin menu)
+UI -> A : prompt text, options A-D, correct letter
+A -> UI : question data
+UI -> QSM : add(session, question)
+
+alt !session.isAdmin() (SEC-07)
+  QSM --> UI : ERR_UNAUTHORIZED
+  UI -> EH : message(ERR_UNAUTHORIZED)
+  EH --> UI : "Access denied. Please log in."
+  UI --> A : show message
+else authorized
+  alt bank size == 100 (NFR-06)
+    QSM --> UI : ERR_BANK_FULL
+    UI --> A : "Question bank is full (100)."
+  else space available
+    QSM -> IV : validateQuestion(question) (FR-10, SEC-06)
+    IV --> QSM : Status
+    alt Status != OK
+      QSM --> UI : ERR_INVALID_QUESTION (reason)
+      UI --> A : show reason, re-prompt
+    else valid
+      QSM -> QSM : append to in-memory bank
+      QSM -> SM : saveQuestions(bank) (FR-17)
+      SM -> QF : write questions.tmp, rename to questions.txt
+      alt write fails
+        SM --> QSM : ERR_IO
+        QSM -> QSM : rollback (remove appended question)
+        QSM --> UI : ERR_IO
+        UI --> A : "Could not save data file. Question not added."
+      else write ok
+        SM --> QSM : OK
+        QSM --> UI : OK
+        UI --> A : "Question added."
+      end
+    end
+  end
+end
+@enduml
