@@ -29,9 +29,9 @@ TEST(question_quiz_and_aggregate_result_services_enforce_admin_role) {
     REQUIRE(quizzes.add(quiz::Session{}, questions, "Quiz", {*question.value}).error == quiz::Error::AccessDenied);
     REQUIRE(quizzes.add(*learner.value, questions, "Quiz", {*question.value}).error == quiz::Error::AccessDenied);
     REQUIRE(quizzes.list().empty());
-    const auto quiz = quizzes.add(*admin.value, questions, "Quiz", {*question.value});
-    REQUIRE(quiz && quizzes.list().size() == 1);
-    REQUIRE(quizzes.modify(*learner.value, questions, *quiz.value, "Changed", {*question.value})
+    const auto createdQuiz = quizzes.add(*admin.value, questions, "Quiz", {*question.value});
+    REQUIRE(createdQuiz && quizzes.list().size() == 1);
+    REQUIRE(quizzes.modify(*learner.value, questions, *createdQuiz.value, "Changed", {*question.value})
         == quiz::Error::AccessDenied);
     REQUIRE(quizzes.remove(quiz::Session{}, *quiz.value) == quiz::Error::AccessDenied);
     REQUIRE(quizzes.find(*quiz.value)->title == "Quiz");
@@ -109,5 +109,4 @@ TEST(question_quiz_and_attempt_file_failures_keep_last_committed_data) {
     quiz::FileAttemptStore attemptReload(temp.path);
     REQUIRE(attemptReload.attempts().size() == 1);
     REQUIRE(attemptReload.attempts().front().quizTitle == "Original");
-}
 }
