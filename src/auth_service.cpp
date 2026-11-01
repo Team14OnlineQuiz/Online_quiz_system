@@ -2,7 +2,9 @@
 #include <exception>
 namespace quiz {
 Result<Id> AuthService::create(const std::string& username, const std::string& password, Role role) {
-    if (!validUsername(username) || password.size() < 8 || password.size() > 1024)
+    std::size_t characters = 0;
+    for (unsigned char c : password) if ((c & 0xc0) != 0x80) ++characters;
+    if (!validUsername(username) || characters < 8 || password.size() > 1024)
         return failure<Id>(Error::Validation);
     if (store_.find(username)) return failure<Id>(Error::DuplicateUser);
     try { return store_.insert(username, hasher_.hash(password), role); }

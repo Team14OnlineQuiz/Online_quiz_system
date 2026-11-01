@@ -10,6 +10,7 @@ TEST(registration_validates_boundaries_and_duplicate_names) {
     REQUIRE(auth.registerLearner("   ", "12345678").error == quiz::Error::Validation);
     REQUIRE(auth.registerLearner("alex\nadmin", "12345678").error == quiz::Error::Validation);
     REQUIRE(auth.registerLearner("alex", "1234567").error == quiz::Error::Validation);
+    REQUIRE(auth.registerLearner("unicode", u8"ééééééé").error == quiz::Error::Validation);
     REQUIRE(auth.registerLearner("alex", "12345678"));
     REQUIRE(auth.registerLearner("alex", "different-password").error == quiz::Error::DuplicateUser);
     REQUIRE(store.users().size() == 1);
