@@ -1,6 +1,6 @@
 # Akshay's Iteration 2 implementation
 
-This branch builds on `codex/akshay-iteration-1` (PR #20).
+This branch builds on `akshay-iteration-1` (PR #22).
 
 | Issue | Implementation | Validation |
 | --- | --- | --- |
