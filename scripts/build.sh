@@ -6,3 +6,6 @@ core=()
 for source in src/*.cpp; do [[ "$source" == src/main.cpp ]] || core+=("$source"); done
 "${CXX:-g++}" -std=c++17 -Wall -Wextra -Werror -pedantic -O2 -Iinclude "${core[@]}" src/main.cpp $(pkg-config --cflags --libs libsodium) -o build/quiz
 "${CXX:-g++}" -std=c++17 -Wall -Wextra -Werror -pedantic -O2 -Iinclude "${core[@]}" tests/*.cpp $(pkg-config --cflags --libs libsodium) -o build/quiz_tests
+if [[ -f tools/benchmark.cpp ]]; then
+  "${CXX:-g++}" -std=c++17 -Wall -Wextra -Werror -pedantic -O2 -Iinclude "${core[@]}" tools/benchmark.cpp $(pkg-config --cflags --libs libsodium) -o build/quiz_benchmark
+fi

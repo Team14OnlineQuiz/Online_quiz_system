@@ -15,11 +15,19 @@ jobs:
       - name: Install development dependencies
         run: sudo apt-get update && sudo apt-get install -y g++ pkg-config libsodium-dev
       - name: Build with warnings treated as errors
-        run: bash scripts/build.sh
+        run: |
+          uname -a
+          g++ --version
+          pkg-config --modversion libsodium
+          bash scripts/build.sh
       - name: Run requirement tests
         run: ./build/quiz_tests
       - name: Smoke-test the executable
         run: python3 scripts/smoke_test.py
+      - name: Verify response times at required data volumes
+        run: |
+          ./build/quiz_benchmark
+          cat build/performance.csv
   windows:
     runs-on: windows-latest
     timeout-minutes: 15
@@ -32,10 +40,19 @@ jobs:
           install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-libsodium mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-python
       - name: Build with warnings treated as errors
         shell: msys2 {0}
-        run: bash scripts/build.sh
+        run: |
+          uname -a
+          g++ --version
+          pkg-config --modversion libsodium
+          bash scripts/build.sh
       - name: Run requirement tests
         shell: msys2 {0}
         run: ./build/quiz_tests
       - name: Smoke-test the executable
         shell: msys2 {0}
         run: python scripts/smoke_test.py
+      - name: Verify response times at required data volumes
+        shell: msys2 {0}
+        run: |
+          ./build/quiz_benchmark
+          cat build/performance.csv

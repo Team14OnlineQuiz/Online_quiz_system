@@ -12,6 +12,8 @@ Windows with MinGW and the official libsodium win64 archive:
 $env:SODIUM_ROOT = 'C:\path\to\libsodium-win64'
 ./scripts/build.ps1
 ./build/quiz_tests.exe
+python scripts/smoke_test.py
+./build/quiz_benchmark.exe
 ./build/quiz.exe
 ```
 
@@ -21,6 +23,8 @@ Linux:
 sudo apt-get install g++ pkg-config libsodium-dev
 bash scripts/build.sh
 ./build/quiz_tests
+python3 scripts/smoke_test.py
+./build/quiz_benchmark
 ./build/quiz
 ```
 
@@ -35,3 +39,7 @@ The learner and administrator menus appear only after authentication. Logout des
 Question authoring and quiz configuration belong to other team members. The console accepts a quiz callback for their implementation and shows `No quizzes available.` until a catalog is supplied. That integration boundary does not complete their stories.
 
 `AnswerSession` is the answer-input component for the quiz callback: pass an ordered snapshot of `QuestionPrompt` values and call `readNext` until `complete()`. Invalid input repeats the same question without appending an answer; EOF leaves the partially completed state available to the caller. `answers()` contains one valid uppercase A-D choice per accepted question. Scoring and completion persistence remain separate services.
+
+Administrators can view completed attempt snapshots through the summary menu. The shared attempt writer must follow [the storage contract](docs/storage-format.md). Missing attempt data produces an empty summary; invalid data produces a recoverable error. Learners and unauthenticated sessions cannot call the summary service.
+
+See [Iteration 1](docs/iteration-1.md), [Iteration 2 and platform commands](docs/iteration-2.md), and [performance measurements](docs/performance.md). GitHub Actions builds and runs the tests, executable smoke, and performance gate on both Windows and Linux.

@@ -1,4 +1,5 @@
 #include "quiz/console.h"
+#include "quiz/result_service.h"
 #include <iostream>
 #include <algorithm>
 int main(int argc, char** argv) {
@@ -32,7 +33,12 @@ int main(int argc, char** argv) {
             std::cerr << "Initialize the administrator first: quiz --init-admin [--data DIRECTORY]\n";
             return 1;
         }
-        quiz::Console console(auth);
+        quiz::FileAttemptStore attempts(data);
+        quiz::ResultService results(store, attempts);
+        quiz::Console console(auth, {}, [&](const quiz::Session& session, std::istream&, std::ostream& output) {
+            try { attempts.reload(); (void)results.displaySummary(session, output); }
+            catch (const std::exception&) { output << "Results unavailable; repair saved data.\n"; }
+        });
         return console.run(std::cin, std::cout);
     } catch (const std::exception& e) {
         std::cerr << "Unable to open quiz data: " << e.what() << '\n';
