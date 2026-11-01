@@ -33,3 +33,5 @@ Run `build/quiz --init-admin` (`build/quiz.exe --init-admin` on Windows) once in
 The learner and administrator menus appear only after authentication. Logout destroys the session. Files contain encoded Argon2id hashes, never plaintext passwords. Authentication failures use one generic message.
 
 Question authoring and quiz configuration belong to other team members. The console accepts a quiz callback for their implementation and shows `No quizzes available.` until a catalog is supplied. That integration boundary does not complete their stories.
+
+`AnswerSession` is the answer-input component for the quiz callback: pass an ordered snapshot of `QuestionPrompt` values and call `readNext` until `complete()`. Invalid input repeats the same question without appending an answer; EOF leaves the partially completed state available to the caller. `answers()` contains one valid uppercase A-D choice per accepted question. Scoring and completion persistence remain separate services.
