@@ -50,6 +50,24 @@ private:
     const AccountStore& accounts_;
     const AttemptStore& attempts_;
 };
+struct LearnerHistoryRow {
+    std::string quizTitle;
+    std::string submittedAt;
+    std::uint32_t correctCount;
+    std::uint32_t totalQuestions;
+    double percentage;
+};
+class LearnerHistoryService {
+public:
+    LearnerHistoryService(const AccountStore& accounts, const AttemptStore& attempts)
+        : accounts_(accounts), attempts_(attempts) {}
+    Result<std::vector<LearnerHistoryRow>> history(const Session& session) const;
+    Result<std::vector<LearnerHistoryRow>> historyFor(const Session& session, Id ownerId) const;
+    Error displayHistory(const Session& session, std::ostream& output) const;
+private:
+    const AccountStore& accounts_;
+    const AttemptStore& attempts_;
+};
 class AttemptService {
 public:
     explicit AttemptService(AttemptWriter& writer) : writer_(writer) {}

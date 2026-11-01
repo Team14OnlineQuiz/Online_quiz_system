@@ -37,7 +37,8 @@ Run \`build/quiz --init-admin\` (\`build/quiz.exe --init-admin\` on Windows) onc
 After signing in, learners can choose:
 
 1. **Take quiz** — discover available quizzes by identifier, title, and question count; select an identifier to start.
-2. **Logout** — destroy the authenticated session.
+2. **View my completed history** — see only the signed-in learner's completed attempts, including quiz title, UTC submission date, correct/total count, and percentage.
+3. **Logout** — destroy the authenticated session.
 
 The learner-facing question snapshot does not contain the answer key. Answers are graded inside the quiz service. An attempt is reported as saved only after its completed record has been written successfully. An interrupted attempt is not stored as completed.
 

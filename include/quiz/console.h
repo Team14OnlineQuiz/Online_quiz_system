@@ -7,9 +7,10 @@ using ConsoleAction = std::function<void(const Session&, std::istream&, std::ost
 class Console {
 public:
     Console(AuthService& auth, ConsoleAction takeQuiz = {}, ConsoleAction summary = {},
-        ConsoleAction questionMaintenance = {}, ConsoleAction quizConfiguration = {})
+        ConsoleAction questionMaintenance = {}, ConsoleAction quizConfiguration = {}, ConsoleAction history = {})
         : auth_(auth), takeQuiz_(std::move(takeQuiz)), summary_(std::move(summary)),
-          questionMaintenance_(std::move(questionMaintenance)), quizConfiguration_(std::move(quizConfiguration)) {}
+          questionMaintenance_(std::move(questionMaintenance)), quizConfiguration_(std::move(quizConfiguration)),
+          history_(std::move(history)) {}
     int run(std::istream& input, std::ostream& output);
 private:
     bool authenticatedMenu(Session& session, std::istream& input, std::ostream& output);
@@ -18,5 +19,6 @@ private:
     ConsoleAction summary_;
     ConsoleAction questionMaintenance_;
     ConsoleAction quizConfiguration_;
+    ConsoleAction history_;
 };
 }
