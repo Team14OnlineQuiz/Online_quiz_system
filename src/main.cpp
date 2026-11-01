@@ -42,7 +42,6 @@ int main(int argc, char** argv) {
         quiz::AttemptService attemptService(attempts);
         quiz::QuizService quizService(quizCatalog, questions);
         quiz::ResultService results(store, attempts);
-        quiz::LearnerHistoryService history(store, attempts);
         quiz::Console console(auth,
             [&](const quiz::Session& session, std::istream& input, std::ostream& output) {
                 (void)quiz::runLearnerQuiz(session, input, output, quizService, attemptService);
@@ -56,10 +55,6 @@ int main(int argc, char** argv) {
             },
             [&](const quiz::Session& session, std::istream& input, std::ostream& output) {
                 quiz::runQuizConfiguration(session, quizCatalog, questions, input, output);
-            },
-            [&](const quiz::Session& session, std::istream&, std::ostream& output) {
-                try { attempts.reload(); (void)history.displayHistory(session, output); }
-                catch (const std::exception&) { output << "History unavailable; repair saved data.\n"; }
             });
         return console.run(std::cin, std::cout);
     } catch (const std::exception& e) {

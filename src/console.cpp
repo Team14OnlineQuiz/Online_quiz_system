@@ -26,24 +26,20 @@ bool Console::authenticatedMenu(Session& session, std::istream& input, std::ostr
                 else output << "No completed attempts.\n";
             }
         } else {
-            output << "Learner menu\n1 Take quiz\n2 View my completed history\n3 Logout\n";
-            output << "Enter choice (1-3): " << std::flush;
+            output << "Learner menu\n1 Take quiz\n2 Logout\n";
+            output << "Enter choice (1-2): " << std::flush;
             const auto choice = readLine(input, 16);
             if (choice.state == InputState::End) { auth_.signOut(session); return false; }
-            if (choice.state == InputState::Value && choice.value == "3") {
+            if (choice.state == InputState::Value && choice.value == "2") {
                 auth_.signOut(session); break;
             }
             if (choice.state != InputState::Value && choice.state != InputState::Invalid) {
-                output << "Invalid choice. Enter 1, 2, or 3.\n"; continue;
+                output << "Invalid choice. Enter 1 or 2.\n"; continue;
             }
             if (choice.value == "1") {
                 if (takeQuiz_) takeQuiz_(session, input, output);
                 else output << "No quizzes available.\n";
-            } else if (choice.value == "2") {
-                if (!session.authenticated() || session.isAdmin()) output << "Access denied.\n";
-                else if (history_) history_(session, input, output);
-                else output << "No completed attempts.\n";
-            } else output << "Invalid choice. Enter 1, 2, or 3.\n";
+            } else output << "Invalid choice. Enter 1 or 2.\n";
         }
     }
     return true;

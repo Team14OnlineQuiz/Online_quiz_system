@@ -47,19 +47,17 @@ TEST(question_quiz_and_aggregate_result_services_enforce_admin_role) {
     REQUIRE(results.summary(*learner.value).error == quiz::Error::AccessDenied);
     REQUIRE(results.summary(*admin.value));
 }
-TEST(attempt_submission_and_learner_history_are_bound_to_authenticated_owner) {
+TEST(attempt_submission_requires_a_learner_session_and_derives_owner_from_session) {
     TempDirectory temp;
     quiz::PasswordHasher hasher;
     quiz::FileAccountStore accounts(temp.path);
     quiz::AuthService auth(accounts, hasher);
     REQUIRE(auth.provisionFirstAdmin("owner", "admin-password"));
     const auto alexId = auth.registerLearner("alex", "learner-password");
-    const auto blairId = auth.registerLearner("blair", "learner-password");
-    REQUIRE(alexId && blairId);
+    REQUIRE(alexId);
     auto admin = auth.signIn("owner", "admin-password");
     auto alex = auth.signIn("alex", "learner-password");
-    auto blair = auth.signIn("blair", "learner-password");
-    REQUIRE(admin && alex && blair);
+    REQUIRE(admin && alex);
     quiz::FileAttemptStore attempts(temp.path);
     quiz::AttemptService submission(attempts);
     REQUIRE(submission.submit(quiz::Session{}, "Quiz A", "2026-10-20T10:00:00Z", 2, 3).error
@@ -67,14 +65,8 @@ TEST(attempt_submission_and_learner_history_are_bound_to_authenticated_owner) {
     REQUIRE(submission.submit(*admin.value, "Quiz A", "2026-10-20T10:00:00Z", 2, 3).error
         == quiz::Error::AccessDenied);
     REQUIRE(submission.submit(*alex.value, "Quiz A", "2026-10-20T10:00:00Z", 2, 3));
-    REQUIRE(submission.submit(*blair.value, "Quiz B", "2026-10-20T11:00:00Z", 1, 3));
-    quiz::LearnerHistoryService history(accounts, attempts);
-    const auto alexHistory = history.history(*alex.value);
-    REQUIRE(alexHistory && alexHistory.value->size() == 1);
-    REQUIRE(alexHistory.value->front().quizTitle == "Quiz A");
-    REQUIRE(history.historyFor(*alex.value, *blairId.value).error == quiz::Error::AccessDenied);
-    REQUIRE(history.history(*admin.value).error == quiz::Error::AccessDenied);
-    REQUIRE(history.history(quiz::Session{}).error == quiz::Error::AccessDenied);
+    REQUIRE(attempts.attempts().size() == 1);
+    REQUIRE(attempts.attempts().front().userId == *alexId.value);
 }
 TEST(question_quiz_and_attempt_file_failures_keep_last_committed_data) {
     TempDirectory temp;

@@ -8,7 +8,7 @@ TEST(console_registration_signin_and_logout_use_real_saved_accounts) {
     quiz::PasswordHasher hasher;
     quiz::FileAccountStore store(temp.path);
     quiz::AuthService auth(store, hasher);
-    std::istringstream input("1\nalex\nlearner-password\n2\nalex\nlearner-password\n3\n3\n");
+    std::istringstream input("1\nalex\nlearner-password\n2\nalex\nlearner-password\n2\n3\n");
     std::ostringstream output;
     quiz::Console console(auth);
     REQUIRE(console.run(input, output) == 0);
@@ -74,7 +74,7 @@ TEST(signin_quiz_input_and_logout_smoke_uses_the_same_console_on_both_platforms)
         finished = true;
         output << "Quiz input complete.\n";
     });
-    std::istringstream input("2\nalex\nlearner-password\n1\nX\nA\nC\n3\n3\n");
+    std::istringstream input("2\nalex\nlearner-password\n1\nX\nA\nC\n2\n3\n");
     std::ostringstream output;
     REQUIRE(console.run(input, output) == 0);
     REQUIRE(finished);
@@ -92,13 +92,12 @@ TEST(learner_console_does_not_dispatch_administrator_callbacks) {
         [](const quiz::Session&, std::istream&, std::ostream& output) { output << "Take quiz callback.\n"; },
         [&](const quiz::Session&, std::istream&, std::ostream&) { summaryAction = true; },
         [&](const quiz::Session&, std::istream&, std::ostream&) { questionAction = true; },
-        [&](const quiz::Session&, std::istream&, std::ostream&) { quizAction = true; },
-        [](const quiz::Session&, std::istream&, std::ostream& output) { output << "History callback.\n"; });
-    std::istringstream input("2\nalex\nlearner-password\n1\n2\n3\n3\n");
+        [&](const quiz::Session&, std::istream&, std::ostream&) { quizAction = true; });
+    std::istringstream input("2\nalex\nlearner-password\n1\n2\n3\n");
     std::ostringstream output;
     REQUIRE(console.run(input, output) == 0);
     REQUIRE(!questionAction);
     REQUIRE(!quizAction);
     REQUIRE(!summaryAction);
-    REQUIRE(output.str().find("History callback.") != std::string::npos);
+    REQUIRE(output.str().find("Take quiz callback.") != std::string::npos);
 }

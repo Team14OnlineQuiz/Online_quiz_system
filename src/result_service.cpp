@@ -132,39 +132,6 @@ Error ResultService::displaySummary(const Session& session, std::ostream& output
     output.flags(flags); output.precision(precision);
     return Error::None;
 }
-Result<std::vector<LearnerHistoryRow>> LearnerHistoryService::history(const Session& session) const {
-    return historyFor(session, session.userId());
-}
-Result<std::vector<LearnerHistoryRow>> LearnerHistoryService::historyFor(const Session& session, Id ownerId) const {
-    if (!session.authenticated() || session.isAdmin() || ownerId == 0 || ownerId != session.userId())
-        return failure<std::vector<LearnerHistoryRow>>(Error::AccessDenied);
-    const auto known = std::find_if(accounts_.users().begin(), accounts_.users().end(),
-        [&](const User& user) { return user.id == session.userId() && user.role == Role::Learner; });
-    if (known == accounts_.users().end()) return failure<std::vector<LearnerHistoryRow>>(Error::AccessDenied);
-    std::vector<LearnerHistoryRow> rows;
-    for (const auto& attempt : attempts_.attempts()) {
-        if (attempt.userId != session.userId() || !attempt.completed) continue;
-        if (attempt.totalQuestions == 0 || attempt.correctCount > attempt.totalQuestions)
-            return failure<std::vector<LearnerHistoryRow>>(Error::Storage);
-        rows.push_back({attempt.quizTitle, attempt.submittedAt, attempt.correctCount, attempt.totalQuestions,
-            100.0 * attempt.correctCount / attempt.totalQuestions});
-    }
-    return success(std::move(rows));
-}
-Error LearnerHistoryService::displayHistory(const Session& session, std::ostream& output) const {
-    const auto result = history(session);
-    if (!result) { output << "Access denied.\n"; return result.error; }
-    if (result.value->empty()) { output << "No completed attempts.\n"; return Error::None; }
-    const auto flags = output.flags();
-    const auto precision = output.precision();
-    output << "Quiz title | Date (UTC) | Score | Percentage\n";
-    for (const auto& row : *result.value)
-        output << std::quoted(row.quizTitle) << " | " << row.submittedAt << " | "
-            << row.correctCount << '/' << row.totalQuestions << " | "
-            << std::fixed << std::setprecision(1) << row.percentage << "%\n";
-    output.flags(flags); output.precision(precision);
-    return Error::None;
-}
 Result<Id> AttemptService::submit(const Session& session, std::string quizTitle, std::string submittedAt,
     std::uint32_t correctCount, std::uint32_t totalQuestions) {
     if (!session.authenticated() || session.isAdmin()) return failure<Id>(Error::AccessDenied);

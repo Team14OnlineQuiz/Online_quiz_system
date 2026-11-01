@@ -10,7 +10,7 @@ Issues: #2 (quiz discovery and selection), #11 (record persistence), #17 (admini
 - Added a persistent quiz catalog with stable identifiers, title snapshots, and ordered question references. Quiz configuration operations independently require an administrator session.
 - Added learner-only quiz discovery and selection. The learner menu lists quiz identifiers, titles, and question counts; selecting a valid identifier starts an answer session without exposing the answer key.
 - Added completed-attempt persistence. A result is reported as saved only after the full attempt has been written and the staged file has been atomically replaced. Incomplete attempts are not committed.
-- Extended the console with separate learner history and administrator-only question maintenance, quiz configuration, and aggregate results actions. Authorization is checked at the controller boundary and again in the underlying services.
+- Extended the console with learner quiz discovery and administrator-only question maintenance, quiz configuration, and aggregate results actions. Authorization is checked at the controller boundary and again in the underlying services.
 - Preserved the existing Argon2id account store, session model, and cross-platform build/test approach.
 
 ## Storage files
@@ -28,9 +28,8 @@ Writes use a \`.tmp\` staging file and the existing \`replaceFile\` adapter. In-
 - Quiz selection rejects unknown identifiers and starts a real answer flow for valid identifiers.
 - Completed submissions survive a new application/store instance; incomplete attempts are not saved.
 - Guest and learner calls to question maintenance, quiz configuration, and aggregate results are rejected by service methods.
-- Learner attempts are bound to the authenticated session owner.
 - Injected failures for question, quiz, and attempt writes leave the previous committed file readable after reload.
-- The executable smoke test covers account registration, authenticated quiz discovery, answer submission, learner-owned history, and administrator summary.
+- The executable smoke test covers account registration, authenticated quiz discovery, answer submission, and administrator summary.
 - CI push filters include the new \`akshath-iteration-*\` branches.
 
 ## Validation status
