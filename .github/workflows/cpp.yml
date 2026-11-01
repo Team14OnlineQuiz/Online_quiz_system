@@ -1,7 +1,7 @@
 name: C++ build and requirements tests
 on:
   push:
-    branches: [main, 'codex/**']
+    branches: [main, 'akshay-iteration-*']
   pull_request:
   workflow_dispatch:
 permissions:
