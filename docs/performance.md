@@ -11,7 +11,7 @@ Fixture generation and initial catalog loading are outside the interaction timin
 
 ## Recorded local run
 
-On 2026-11-01, Windows with GCC 14.2.0, C++17 `-O2`, and libsodium 1.0.22 produced:
+On 2026-11-01, Windows x64 (OS build 10.0.26300), Intel Core i5-1135G7 @ 2.40 GHz, GCC 14.2.0, C++17 `-O2`, and libsodium 1.0.22 produced:
 
 | Operation | Samples | 95th percentile | Limit |
 | --- | ---: | ---: | ---: |
