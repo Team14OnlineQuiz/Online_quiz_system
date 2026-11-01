@@ -33,8 +33,8 @@ TEST(question_quiz_and_aggregate_result_services_enforce_admin_role) {
     REQUIRE(createdQuiz && quizzes.list().size() == 1);
     REQUIRE(quizzes.modify(*learner.value, questions, *createdQuiz.value, "Changed", {*question.value})
         == quiz::Error::AccessDenied);
-    REQUIRE(quizzes.remove(quiz::Session{}, *quiz.value) == quiz::Error::AccessDenied);
-    REQUIRE(quizzes.find(*quiz.value)->title == "Quiz");
+    REQUIRE(quizzes.remove(quiz::Session{}, *createdQuiz.value) == quiz::Error::AccessDenied);
+    REQUIRE(quizzes.find(*createdQuiz.value)->title == "Quiz");
 
     quiz::FileAttemptStore attempts(temp.path);
     quiz::ResultService results(accounts, attempts);
