@@ -27,3 +27,13 @@ attemptId userId completed correctCount totalQuestions "quizTitleSnapshot" "subm
 The title and evaluation counts are snapshots: later edits to quiz definitions do not alter past scores. The attempt writer is another member's persistence task; this branch adds the validated read adapter and `AttemptStore` interface needed for #10. A shared in-memory writer can implement the interface without changing the summary service.
 
 `FileAttemptStore::reload` stages all parsed rows before replacing its previous in-memory snapshot. Invalid files report a recoverable error and do not expose partially parsed results. Call the service with the current authenticated `Session`; direct learner and guest calls are denied independently of menu visibility.
+
+## Question catalog reader
+
+`questions.db` begins with `QUIZ_QUESTIONS_V1`. Records contain:
+
+```text
+questionId active correctLetter "prompt" "choiceA" "choiceB" "choiceC" "choiceD"
+```
+
+IDs are positive and unique, `active` is 0 or 1, and `correctLetter` is uppercase A-D. Text fields are nonempty, bounded, and contain no control characters. `QuestionCatalog` indexes active prompts by ID; its learner-facing `QuestionPrompt` excludes the answer key. Missing files produce an empty catalog. Malformed records reject the load. Question creation, editing, quiz configuration, and the shared attempt writer remain their assigned owners' stories; this is a read adapter for integration and the response-time benchmark.
