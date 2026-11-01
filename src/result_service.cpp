@@ -1,4 +1,5 @@
 #include "quiz/result_service.h"
+#include "quiz/account_store.h"
 #include <algorithm>
 #include <cctype>
 #include <fstream>
@@ -24,13 +25,15 @@ bool validSubmissionDate(const std::string& value) {
     return day >= 1 && day <= days[month - 1] && std::stoi(value.substr(11, 2)) <= 23
         && std::stoi(value.substr(14, 2)) <= 59 && std::stoi(value.substr(17, 2)) <= 59;
 }
-FileAttemptStore::FileAttemptStore(std::filesystem::path directory) : file_(std::move(directory) / "attempts.db") { reload(); }
+FileAttemptStore::FileAttemptStore(std::filesystem::path directory)
+    : file_(std::move(directory) / "attempts.db") { reload(); }
 void FileAttemptStore::reload() {
     if (!std::filesystem::exists(file_)) { attempts_.clear(); return; }
     std::ifstream input(file_);
     if (!input) throw std::runtime_error("Cannot read attempts.db; repair the data directory");
     std::string line;
-    if (!std::getline(input, line) || line != "QUIZ_ATTEMPTS_V1") throw std::runtime_error("Invalid attempts.db header");
+    if (!std::getline(input, line) || line != "QUIZ_ATTEMPTS_V1")
+        throw std::runtime_error("Invalid attempts.db header");
     std::vector<AttemptRecord> staged;
     std::unordered_set<Id> ids;
     while (std::getline(input, line)) {
@@ -53,6 +56,49 @@ void FileAttemptStore::reload() {
     }
     if (input.bad()) throw std::runtime_error("Attempt read failed");
     attempts_.swap(staged);
+}
+bool FileAttemptStore::persist(const std::vector<AttemptRecord>& staged) const {
+    auto temporary = file_;
+    temporary += ".tmp";
+    try {
+        std::ofstream output(temporary, std::ios::trunc);
+        if (!output) return false;
+        output << "QUIZ_ATTEMPTS_V1\n";
+        for (const auto& attempt : staged) {
+            output << attempt.id << ' ' << attempt.userId << ' ' << (attempt.completed ? 1 : 0)
+                << ' ' << attempt.correctCount << ' ' << attempt.totalQuestions << ' '
+                << std::quoted(attempt.quizTitle) << ' ' << std::quoted(attempt.submittedAt) << '\n';
+        }
+        output.flush();
+        if (!output) return false;
+        output.close();
+        if (!output) return false;
+        replaceFile(temporary, file_);
+        return true;
+    } catch (const std::exception&) { return false; }
+}
+Result<Id> FileAttemptStore::insert(AttemptRecord record) {
+    if (record.userId == 0 || !record.completed || record.totalQuestions == 0
+        || record.correctCount > record.totalQuestions || record.quizTitle.empty()
+        || record.quizTitle.size() > 512 || !validSubmissionDate(record.submittedAt)
+        || std::any_of(record.quizTitle.begin(), record.quizTitle.end(),
+            [](unsigned char c) { return c < 32 || c == 127; }))
+        return failure<Id>(Error::Validation);
+    Id next = 1;
+    for (const auto& existing : attempts_) {
+        if (existing.id == std::numeric_limits<Id>::max()) return failure<Id>(Error::Storage);
+        next = std::max(next, existing.id + 1);
+    }
+    if (record.id == 0) record.id = next;
+    else if (std::any_of(attempts_.begin(), attempts_.end(),
+        [&](const AttemptRecord& existing) { return existing.id == record.id; }))
+        return failure<Id>(Error::Validation);
+    auto staged = attempts_;
+    const Id id = record.id;
+    staged.push_back(std::move(record));
+    if (!persist(staged)) return failure<Id>(Error::Storage);
+    attempts_.swap(staged);
+    return success(id);
 }
 Result<std::vector<SummaryRow>> ResultService::summary(const Session& session) const {
     if (!session.isAdmin()) return failure<std::vector<SummaryRow>>(Error::AccessDenied);
@@ -85,5 +131,47 @@ Error ResultService::displaySummary(const Session& session, std::ostream& output
             << std::fixed << std::setprecision(1) << row.percentage << "%\n";
     output.flags(flags); output.precision(precision);
     return Error::None;
+}
+Result<std::vector<LearnerHistoryRow>> LearnerHistoryService::history(const Session& session) const {
+    return historyFor(session, session.userId());
+}
+Result<std::vector<LearnerHistoryRow>> LearnerHistoryService::historyFor(const Session& session, Id ownerId) const {
+    if (!session.authenticated() || session.isAdmin() || ownerId == 0 || ownerId != session.userId())
+        return failure<std::vector<LearnerHistoryRow>>(Error::AccessDenied);
+    const auto known = std::find_if(accounts_.users().begin(), accounts_.users().end(),
+        [&](const User& user) { return user.id == session.userId() && user.role == Role::Learner; });
+    if (known == accounts_.users().end()) return failure<std::vector<LearnerHistoryRow>>(Error::AccessDenied);
+    std::vector<LearnerHistoryRow> rows;
+    for (const auto& attempt : attempts_.attempts()) {
+        if (attempt.userId != session.userId() || !attempt.completed) continue;
+        if (attempt.totalQuestions == 0 || attempt.correctCount > attempt.totalQuestions)
+            return failure<std::vector<LearnerHistoryRow>>(Error::Storage);
+        rows.push_back({attempt.quizTitle, attempt.submittedAt, attempt.correctCount, attempt.totalQuestions,
+            100.0 * attempt.correctCount / attempt.totalQuestions});
+    }
+    return success(std::move(rows));
+}
+Error LearnerHistoryService::displayHistory(const Session& session, std::ostream& output) const {
+    const auto result = history(session);
+    if (!result) { output << "Access denied.\n"; return result.error; }
+    if (result.value->empty()) { output << "No completed attempts.\n"; return Error::None; }
+    const auto flags = output.flags();
+    const auto precision = output.precision();
+    output << "Quiz title | Date (UTC) | Score | Percentage\n";
+    for (const auto& row : *result.value)
+        output << std::quoted(row.quizTitle) << " | " << row.submittedAt << " | "
+            << row.correctCount << '/' << row.totalQuestions << " | "
+            << std::fixed << std::setprecision(1) << row.percentage << "%\n";
+    output.flags(flags); output.precision(precision);
+    return Error::None;
+}
+Result<Id> AttemptService::submit(const Session& session, std::string quizTitle, std::string submittedAt,
+    std::uint32_t correctCount, std::uint32_t totalQuestions) {
+    if (!session.authenticated() || session.isAdmin()) return failure<Id>(Error::AccessDenied);
+    if (totalQuestions == 0 || correctCount > totalQuestions || quizTitle.empty()
+        || quizTitle.size() > 512 || !validSubmissionDate(submittedAt))
+        return failure<Id>(Error::Validation);
+    return writer_.insert({0, session.userId(), std::move(quizTitle), std::move(submittedAt),
+        correctCount, totalQuestions, true});
 }
 }
