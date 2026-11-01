@@ -1,0 +1,58 @@
+name: C++ build and requirements tests
+on:
+  push:
+    branches: [main, 'akshay-iteration-*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install development dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++ pkg-config libsodium-dev
+      - name: Build with warnings treated as errors
+        run: |
+          uname -a
+          g++ --version
+          pkg-config --modversion libsodium
+          bash scripts/build.sh
+      - name: Run requirement tests
+        run: ./build/quiz_tests
+      - name: Smoke-test the executable
+        run: python3 scripts/smoke_test.py
+      - name: Verify response times at required data volumes
+        run: |
+          ./build/quiz_benchmark
+          cat build/performance.csv
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-libsodium mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-python
+      - name: Build with warnings treated as errors
+        shell: msys2 {0}
+        run: |
+          uname -a
+          g++ --version
+          pkg-config --modversion libsodium
+          bash scripts/build.sh
+      - name: Run requirement tests
+        shell: msys2 {0}
+        run: ./build/quiz_tests
+      - name: Smoke-test the executable
+        shell: msys2 {0}
+        run: python scripts/smoke_test.py
+      - name: Verify response times at required data volumes
+        shell: msys2 {0}
+        run: |
+          ./build/quiz_benchmark
+          cat build/performance.csv
