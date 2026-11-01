@@ -18,3 +18,7 @@ $tests = @(Get-ChildItem (Join-Path $repo 'tests') -Filter '*.cpp' | ForEach-Obj
 & $Compiler @flags @core @tests @libs -o (Join-Path $build 'quiz_tests.exe')
 if ($LASTEXITCODE -ne 0) { throw 'Test compilation failed' }
 Write-Output 'Built build/quiz.exe and build/quiz_tests.exe'
+if (Test-Path (Join-Path $repo 'tools\benchmark.cpp')) {
+    & $Compiler @flags @core (Join-Path $repo 'tools\benchmark.cpp') @libs -o (Join-Path $build 'quiz_benchmark.exe')
+    if ($LASTEXITCODE -ne 0) { throw 'Benchmark compilation failed' }
+}
