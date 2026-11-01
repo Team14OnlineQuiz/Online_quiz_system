@@ -1,7 +1,9 @@
+#include "quiz/admin_console.h"
 #include "quiz/console.h"
+#include "quiz/quiz_service.h"
 #include "quiz/result_service.h"
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 int main(int argc, char** argv) {
     try {
         std::filesystem::path data = "data";
@@ -29,16 +31,36 @@ int main(int argc, char** argv) {
             std::cout << "Administrator account saved.\n";
             return 0;
         }
-        if (std::none_of(store.users().begin(), store.users().end(), [](const quiz::User& u) { return u.role == quiz::Role::Admin; })) {
+        if (std::none_of(store.users().begin(), store.users().end(),
+            [](const quiz::User& user) { return user.role == quiz::Role::Admin; })) {
             std::cerr << "Initialize the administrator first: quiz --init-admin [--data DIRECTORY]\n";
             return 1;
         }
+        quiz::QuestionCatalog questions(data);
+        quiz::QuizCatalog quizCatalog(data, questions);
         quiz::FileAttemptStore attempts(data);
+        quiz::AttemptService attemptService(attempts);
+        quiz::QuizService quizService(quizCatalog, questions);
         quiz::ResultService results(store, attempts);
-        quiz::Console console(auth, {}, [&](const quiz::Session& session, std::istream&, std::ostream& output) {
-            try { attempts.reload(); (void)results.displaySummary(session, output); }
-            catch (const std::exception&) { output << "Results unavailable; repair saved data.\n"; }
-        });
+        quiz::LearnerHistoryService history(store, attempts);
+        quiz::Console console(auth,
+            [&](const quiz::Session& session, std::istream& input, std::ostream& output) {
+                (void)quiz::runLearnerQuiz(session, input, output, quizService, attemptService);
+            },
+            [&](const quiz::Session& session, std::istream&, std::ostream& output) {
+                try { attempts.reload(); (void)results.displaySummary(session, output); }
+                catch (const std::exception&) { output << "Results unavailable; repair saved data.\n"; }
+            },
+            [&](const quiz::Session& session, std::istream& input, std::ostream& output) {
+                quiz::runQuestionMaintenance(session, questions, input, output);
+            },
+            [&](const quiz::Session& session, std::istream& input, std::ostream& output) {
+                quiz::runQuizConfiguration(session, quizCatalog, questions, input, output);
+            },
+            [&](const quiz::Session& session, std::istream&, std::ostream& output) {
+                try { attempts.reload(); (void)history.displayHistory(session, output); }
+                catch (const std::exception&) { output << "History unavailable; repair saved data.\n"; }
+            });
         return console.run(std::cin, std::cout);
     } catch (const std::exception& e) {
         std::cerr << "Unable to open quiz data: " << e.what() << '\n';

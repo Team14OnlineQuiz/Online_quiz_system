@@ -2,19 +2,48 @@
 namespace quiz {
 bool Console::authenticatedMenu(Session& session, std::istream& input, std::ostream& output) {
     while (session.authenticated()) {
-        if (session.isAdmin()) output << "Administrator menu\n1 Results summary\n2 Logout\n";
-        else output << "Learner menu\n1 Take quiz\n2 Logout\n";
-        output << "Enter choice (1-2): " << std::flush;
-        const auto choice = readLine(input, 16);
-        if (choice.state == InputState::End) { auth_.signOut(session); return false; }
-        if (choice.state == InputState::Value && choice.value == "2") { auth_.signOut(session); break; }
-        if (choice.state != InputState::Value || choice.value != "1") {
-            output << "Invalid choice. Enter 1 or 2.\n"; continue;
-        }
         if (session.isAdmin()) {
-            if (summary_) summary_(session, input, output); else output << "No completed attempts.\n";
+            output << "Administrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\n";
+            output << "Enter choice (1-4): " << std::flush;
+            const auto choice = readLine(input, 16);
+            if (choice.state == InputState::End) { auth_.signOut(session); return false; }
+            if (choice.state == InputState::Value && choice.value == "4") {
+                auth_.signOut(session); break;
+            }
+            if (choice.state != InputState::Value
+                || (choice.value != "1" && choice.value != "2" && choice.value != "3")) {
+                output << "Invalid choice. Enter 1, 2, 3, or 4.\n"; continue;
+            }
+            if (!session.isAdmin()) { output << "Access denied.\n"; continue; }
+            if (choice.value == "1") {
+                if (questionMaintenance_) questionMaintenance_(session, input, output);
+                else output << "Question maintenance unavailable.\n";
+            } else if (choice.value == "2") {
+                if (quizConfiguration_) quizConfiguration_(session, input, output);
+                else output << "Quiz configuration unavailable.\n";
+            } else {
+                if (summary_) summary_(session, input, output);
+                else output << "No completed attempts.\n";
+            }
         } else {
-            if (takeQuiz_) takeQuiz_(session, input, output); else output << "No quizzes available.\n";
+            output << "Learner menu\n1 Take quiz\n2 View my completed history\n3 Logout\n";
+            output << "Enter choice (1-3): " << std::flush;
+            const auto choice = readLine(input, 16);
+            if (choice.state == InputState::End) { auth_.signOut(session); return false; }
+            if (choice.state == InputState::Value && choice.value == "3") {
+                auth_.signOut(session); break;
+            }
+            if (choice.state != InputState::Value && choice.state != InputState::Invalid) {
+                output << "Invalid choice. Enter 1, 2, or 3.\n"; continue;
+            }
+            if (choice.value == "1") {
+                if (takeQuiz_) takeQuiz_(session, input, output);
+                else output << "No quizzes available.\n";
+            } else if (choice.value == "2") {
+                if (!session.authenticated() || session.isAdmin()) output << "Access denied.\n";
+                else if (history_) history_(session, input, output);
+                else output << "No completed attempts.\n";
+            } else output << "Invalid choice. Enter 1, 2, or 3.\n";
         }
     }
     return true;

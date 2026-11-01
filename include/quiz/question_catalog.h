@@ -1,15 +1,30 @@
 #pragma once
 #include "answer_session.h"
+#include "types.h"
 #include <filesystem>
-#include <unordered_map>
+#include <map>
+#include <optional>
 namespace quiz {
-// Read-only adapter and integration seam; administration/writing is a separate story.
+struct StoredQuestion {
+    QuestionPrompt prompt;
+    char correctAnswer = 'A';
+    bool active = true;
+};
 class QuestionCatalog {
 public:
     explicit QuestionCatalog(const std::filesystem::path& directory);
     const QuestionPrompt* find(Id id) const;
-    std::size_t size() const { return prompts_.size(); }
+    std::optional<char> correctAnswer(Id id) const;
+    bool contains(Id id) const;
+    std::size_t size() const;
+    std::vector<QuestionPrompt> list() const;
+    Result<Id> add(const Session& session, QuestionPrompt prompt, char correctAnswer);
+    Error modify(const Session& session, Id id, QuestionPrompt prompt, char correctAnswer);
+    Error remove(const Session& session, Id id);
 private:
-    std::unordered_map<Id, QuestionPrompt> prompts_;
+    bool persist(const std::map<Id, StoredQuestion>& staged) const;
+    std::filesystem::path file_;
+    std::map<Id, StoredQuestion> questions_;
 };
+bool validQuestion(const QuestionPrompt& prompt, char correctAnswer);
 }
