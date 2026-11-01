@@ -1,0 +1,6 @@
+build/
+data/
+.deps/
+*.exe
+*.o
+*.tmp
