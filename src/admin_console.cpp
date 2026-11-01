@@ -107,7 +107,7 @@ void runQuizConfiguration(const Session& session, QuizCatalog& quizzes,
                 output << quiz.id << ": " << quiz.title << " (" << quiz.questionIds.size() << " questions)\n";
             }
             output << "Active question identifiers:";
-            for (const auto& question : questions.list()) output << ' ' << question.id;
+            for (const auto& question : questions.list(session)) output << ' ' << question.id;
             output << '\n';
         } else if (choice.value == "2" || choice.value == "3") {
             Id id = 0;
