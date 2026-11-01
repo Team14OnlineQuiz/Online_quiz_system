@@ -65,8 +65,9 @@ std::size_t QuestionCatalog::size() const {
     return static_cast<std::size_t>(std::count_if(questions_.begin(), questions_.end(),
         [](const auto& entry) { return entry.second.active; }));
 }
-std::vector<QuestionPrompt> QuestionCatalog::list() const {
+std::vector<QuestionPrompt> QuestionCatalog::list(const Session& session) const {
     std::vector<QuestionPrompt> result;
+    if (!session.isAdmin()) return result;
     for (const auto& entry : questions_) if (entry.second.active) result.push_back(entry.second.prompt);
     return result;
 }

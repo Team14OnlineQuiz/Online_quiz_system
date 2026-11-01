@@ -19,8 +19,11 @@ TEST(question_quiz_and_aggregate_result_services_enforce_admin_role) {
     REQUIRE(questions.add(quiz::Session{}, prompt, 'A').error == quiz::Error::AccessDenied);
     REQUIRE(questions.add(*learner.value, prompt, 'A').error == quiz::Error::AccessDenied);
     REQUIRE(questions.size() == 0);
+    REQUIRE(questions.list(quiz::Session{}).empty());
+    REQUIRE(questions.list(*learner.value).empty());
     const auto question = questions.add(*admin.value, prompt, 'A');
     REQUIRE(question && questions.size() == 1);
+    REQUIRE(questions.list(*admin.value).size() == 1);
     REQUIRE(questions.modify(*learner.value, *question.value, prompt, 'B') == quiz::Error::AccessDenied);
     REQUIRE(questions.remove(quiz::Session{}, *question.value) == quiz::Error::AccessDenied);
     REQUIRE(questions.size() == 1);
@@ -28,13 +31,15 @@ TEST(question_quiz_and_aggregate_result_services_enforce_admin_role) {
     quiz::QuizCatalog quizzes(temp.path, questions);
     REQUIRE(quizzes.add(quiz::Session{}, questions, "Quiz", {*question.value}).error == quiz::Error::AccessDenied);
     REQUIRE(quizzes.add(*learner.value, questions, "Quiz", {*question.value}).error == quiz::Error::AccessDenied);
-    REQUIRE(quizzes.list().empty());
+    REQUIRE(quizzes.list(quiz::Session{}).empty());
+    REQUIRE(quizzes.list(*learner.value).empty());
     const auto createdQuiz = quizzes.add(*admin.value, questions, "Quiz", {*question.value});
-    REQUIRE(createdQuiz && quizzes.list().size() == 1);
+    REQUIRE(createdQuiz && quizzes.list(*admin.value).size() == 1);
     REQUIRE(quizzes.modify(*learner.value, questions, *createdQuiz.value, "Changed", {*question.value})
         == quiz::Error::AccessDenied);
     REQUIRE(quizzes.remove(quiz::Session{}, *createdQuiz.value) == quiz::Error::AccessDenied);
-    REQUIRE(quizzes.find(*createdQuiz.value)->title == "Quiz");
+    REQUIRE(quizzes.find(*learner.value, *createdQuiz.value) == nullptr);
+    REQUIRE(quizzes.find(*admin.value, *createdQuiz.value)->title == "Quiz");
 
     quiz::FileAttemptStore attempts(temp.path);
     quiz::ResultService results(accounts, attempts);
@@ -93,9 +98,9 @@ TEST(question_quiz_and_attempt_file_failures_keep_last_committed_data) {
     REQUIRE(quizzes.add(*admin.value, questionReload, "Original", {*q1.value}));
     std::filesystem::create_directory(temp.path / "quizzes.db.tmp");
     REQUIRE(quizzes.add(*admin.value, questionReload, "Rejected", {*q1.value}).error == quiz::Error::Storage);
-    REQUIRE(quizzes.list().size() == 1);
+    REQUIRE(quizzes.list(*admin.value).size() == 1);
     quiz::QuizCatalog quizReload(temp.path, questionReload);
-    REQUIRE(quizReload.list().size() == 1);
+    REQUIRE(quizReload.list(*admin.value).size() == 1);
 
     REQUIRE(auth.registerLearner("alex", "learner-password"));
     auto learner = auth.signIn("alex", "learner-password");

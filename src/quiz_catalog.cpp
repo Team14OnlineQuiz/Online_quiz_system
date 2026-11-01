@@ -46,15 +46,32 @@ QuizCatalog::QuizCatalog(const std::filesystem::path& directory, const QuestionC
     }
     if (input.bad()) throw std::runtime_error("Quiz read failed");
 }
-const QuizDefinition* QuizCatalog::find(Id id) const {
+const QuizDefinition* QuizCatalog::lookup(Id id) const {
     const auto it = std::find_if(quizzes_.begin(), quizzes_.end(),
         [&](const QuizDefinition& quiz) { return quiz.id == id && quiz.active; });
     return it == quizzes_.end() ? nullptr : &*it;
 }
-std::vector<QuizDefinition> QuizCatalog::list() const {
+const QuizDefinition* QuizCatalog::find(const Session& session, Id id) const {
+    if (!session.isAdmin()) return nullptr;
+    return lookup(id);
+}
+const QuizDefinition* QuizCatalog::findForLearner(const Session& session, Id id) const {
+    if (!session.authenticated() || session.isAdmin()) return nullptr;
+    return lookup(id);
+}
+std::vector<QuizDefinition> QuizCatalog::activeList() const {
     std::vector<QuizDefinition> result;
     for (const auto& quiz : quizzes_) if (quiz.active) result.push_back(quiz);
     return result;
+}
+std::vector<QuizDefinition> QuizCatalog::list(const Session& session) const {
+    if (!session.isAdmin()) return {};
+    return activeList();
+}
+Result<std::vector<QuizDefinition>> QuizCatalog::learnerList(const Session& session) const {
+    if (!session.authenticated() || session.isAdmin())
+        return failure<std::vector<QuizDefinition>>(Error::AccessDenied);
+    return success(activeList());
 }
 bool QuizCatalog::validDefinition(const QuestionCatalog& questions, const std::string& title,
     const std::vector<Id>& questionIds) const {

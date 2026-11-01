@@ -24,7 +24,7 @@ attemptId userId completed correctCount totalQuestions "quizTitleSnapshot" "subm
 
 `completed` is `0` or `1`. Counts satisfy `0 <= correctCount <= totalQuestions` and `totalQuestions > 0`. Dates use valid calendar timestamps such as `2026-10-20T10:00:00Z`. Only completed rows are shown in the administrator summary. Unknown account IDs fail the summary instead of becoming anonymous valid scores.
 
-The title and evaluation counts are snapshots: later edits to quiz definitions do not alter past scores. The attempt writer is another member's persistence task; this branch adds the validated read adapter and `AttemptStore` interface needed for #10. A shared in-memory writer can implement the interface without changing the summary service.
+The title and evaluation counts are snapshots: later edits to quiz definitions do not alter past scores. The `FileAttemptStore` also implements `AttemptWriter::insert`. It writes only completed attempts, uses a temporary file followed by atomic replacement, and updates the in-memory snapshot only after the replacement succeeds. `AttemptService::submit` derives the owner ID from the authenticated learner session and refuses guest or administrator submissions.
 
 `FileAttemptStore::reload` stages all parsed rows before replacing its previous in-memory snapshot. Invalid files report a recoverable error and do not expose partially parsed results. Call the service with the current authenticated `Session`; direct learner and guest calls are denied independently of menu visibility.
 
@@ -36,4 +36,4 @@ The title and evaluation counts are snapshots: later edits to quiz definitions d
 questionId active correctLetter "prompt" "choiceA" "choiceB" "choiceC" "choiceD"
 ```
 
-IDs are positive and unique, `active` is 0 or 1, and `correctLetter` is uppercase A-D. Text fields are nonempty, bounded, and contain no control characters. `QuestionCatalog` indexes active prompts by ID; its learner-facing `QuestionPrompt` excludes the answer key. Missing files produce an empty catalog. Malformed records reject the load. Question creation, editing, quiz configuration, and the shared attempt writer remain their assigned owners' stories; this is a read adapter for integration and the response-time benchmark.
+IDs are positive and unique, `active` is 0 or 1, and `correctLetter` is uppercase A-D. Text fields are nonempty, bounded, and contain no control characters. `QuestionCatalog` indexes active prompts by ID; its learner-facing `QuestionPrompt` excludes the answer key. Missing files produce an empty catalog. Malformed records reject the load. Question creation, editing, and archive operations are provided by `QuestionCatalog` and require an administrator session. Quiz definitions are persisted separately in `quizzes.db`; `QuizCatalog` provides administrator-only create, modify, and archive operations. The learner-facing catalog interface returns active prompts without their answer keys.

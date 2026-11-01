@@ -12,14 +12,19 @@ struct QuizDefinition {
 class QuizCatalog {
 public:
     QuizCatalog(const std::filesystem::path& directory, const QuestionCatalog& questions);
-    const QuizDefinition* find(Id id) const;
-    std::vector<QuizDefinition> list() const;
+    const QuizDefinition* find(const Session& session, Id id) const;
+    std::vector<QuizDefinition> list(const Session& session) const;
+    Result<std::vector<QuizDefinition>> learnerList(const Session& session) const;
     Result<Id> add(const Session& session, const QuestionCatalog& questions,
         std::string title, std::vector<Id> questionIds);
     Error modify(const Session& session, const QuestionCatalog& questions, Id id,
         std::string title, std::vector<Id> questionIds);
     Error remove(const Session& session, Id id);
 private:
+    friend class QuizService;
+    const QuizDefinition* findForLearner(const Session& session, Id id) const;
+    const QuizDefinition* lookup(Id id) const;
+    std::vector<QuizDefinition> activeList() const;
     bool validDefinition(const QuestionCatalog& questions, const std::string& title,
         const std::vector<Id>& questionIds) const;
     bool persist(const std::vector<QuizDefinition>& staged) const;

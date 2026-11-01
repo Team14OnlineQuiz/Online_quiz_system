@@ -52,7 +52,7 @@ TEST(learner_discovers_selects_and_completes_a_persisted_quiz) {
     quiz::QuizCatalog reloadedQuizzes(temp.path, reloadedQuestions);
     quiz::FileAttemptStore reloadedAttempts(temp.path);
     REQUIRE(reloadedQuestions.size() == 2);
-    REQUIRE(reloadedQuizzes.list().size() == 1);
+    REQUIRE(reloadedQuizzes.list(*admin.value).size() == 1);
     REQUIRE(reloadedAttempts.attempts().size() == 1);
     REQUIRE(reloadedAttempts.attempts().front().userId == learner.value->userId());
     REQUIRE(reloadedAttempts.attempts().front().completed);

@@ -9,14 +9,16 @@ namespace quiz {
 Result<std::vector<QuizListing>> QuizService::discover(const Session& session) const {
     if (!session.authenticated() || session.isAdmin())
         return failure<std::vector<QuizListing>>(Error::AccessDenied);
+    const auto definitions = quizzes_.learnerList(session);
+    if (!definitions) return failure<std::vector<QuizListing>>(definitions.error);
     std::vector<QuizListing> result;
-    for (const auto& quiz : quizzes_.list())
+    for (const auto& quiz : *definitions.value)
         result.push_back({quiz.id, quiz.title, quiz.questionIds.size()});
     return success(std::move(result));
 }
 Result<QuizSnapshot> QuizService::select(const Session& session, Id quizId) const {
     if (!session.authenticated() || session.isAdmin()) return failure<QuizSnapshot>(Error::AccessDenied);
-    const auto* quiz = quizzes_.find(quizId);
+    const auto* quiz = quizzes_.findForLearner(session, quizId);
     if (!quiz) return failure<QuizSnapshot>(Error::Validation);
     QuizSnapshot snapshot{quiz->id, quiz->title, {}};
     snapshot.questions.reserve(quiz->questionIds.size());

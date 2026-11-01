@@ -56,7 +56,7 @@ void runQuestionMaintenance(const Session& session, QuestionCatalog& questions,
         const auto choice = readLine(input, 8);
         if (choice.state != InputState::Value || choice.value == "5") return;
         if (choice.value == "1") {
-            const auto list = questions.list();
+            const auto list = questions.list(session);
             if (list.empty()) output << "No active questions.\n";
             for (const auto& q : list) {
                 output << q.id << ": " << q.text << '\n';
@@ -101,7 +101,7 @@ void runQuizConfiguration(const Session& session, QuizCatalog& quizzes,
         const auto choice = readLine(input, 8);
         if (choice.state != InputState::Value || choice.value == "5") return;
         if (choice.value == "1") {
-            const auto list = quizzes.list();
+            const auto list = quizzes.list(session);
             if (list.empty()) output << "No quizzes configured.\n";
             for (const auto& quiz : list) {
                 output << quiz.id << ": " << quiz.title << " (" << quiz.questionIds.size() << " questions)\n";

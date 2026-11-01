@@ -17,7 +17,7 @@ public:
     std::optional<char> correctAnswer(const Session& session, Id id) const;
     bool contains(Id id) const;
     std::size_t size() const;
-    std::vector<QuestionPrompt> list() const;
+    std::vector<QuestionPrompt> list(const Session& session) const;
     Result<Id> add(const Session& session, QuestionPrompt prompt, char correctAnswer);
     Error modify(const Session& session, Id id, QuestionPrompt prompt, char correctAnswer);
     Error remove(const Session& session, Id id);
