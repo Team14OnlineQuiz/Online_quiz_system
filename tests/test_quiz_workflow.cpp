@@ -35,7 +35,10 @@ TEST(learner_discovers_selects_and_completes_a_persisted_quiz) {
     REQUIRE(listings.value->at(0).questionCount == 2);
     const auto selected = service.select(*learner.value, *created.value);
     REQUIRE(selected && selected.value->questions.size() == 2);
-    REQUIRE(selected.value->answerKey == std::vector<char>({'A', 'D'}));
+    const auto grade = service.grade(*learner.value, *selected.value, {'A', 'D'});
+    REQUIRE(grade && *grade.value == 2);
+    const auto partialGrade = service.grade(*learner.value, *selected.value, {'A', 'A'});
+    REQUIRE(partialGrade && *partialGrade.value == 1);
     REQUIRE(service.select(*learner.value, 9999).error == quiz::Error::Validation);
     quiz::FileAttemptStore attempts(temp.path);
     quiz::AttemptService submission(attempts);

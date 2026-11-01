@@ -13,7 +13,6 @@ struct QuizSnapshot {
     Id id;
     std::string title;
     std::vector<QuestionPrompt> questions;
-    std::vector<char> answerKey;
 };
 class QuizService {
 public:
@@ -21,6 +20,8 @@ public:
         : quizzes_(quizzes), questions_(questions) {}
     Result<std::vector<QuizListing>> discover(const Session& session) const;
     Result<QuizSnapshot> select(const Session& session, Id quizId) const;
+    Result<std::uint32_t> grade(const Session& session, const QuizSnapshot& quiz,
+        const std::vector<char>& answers) const;
 private:
     const QuizCatalog& quizzes_;
     const QuestionCatalog& questions_;

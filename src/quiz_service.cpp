@@ -18,17 +18,30 @@ Result<QuizSnapshot> QuizService::select(const Session& session, Id quizId) cons
     if (!session.authenticated() || session.isAdmin()) return failure<QuizSnapshot>(Error::AccessDenied);
     const auto* quiz = quizzes_.find(quizId);
     if (!quiz) return failure<QuizSnapshot>(Error::Validation);
-    QuizSnapshot snapshot{quiz->id, quiz->title, {}, {}};
+    QuizSnapshot snapshot{quiz->id, quiz->title, {}};
     snapshot.questions.reserve(quiz->questionIds.size());
-    snapshot.answerKey.reserve(quiz->questionIds.size());
     for (Id questionId : quiz->questionIds) {
         const auto* prompt = questions_.find(questionId);
-        const auto correct = questions_.correctAnswer(questionId);
-        if (!prompt || !correct) return failure<QuizSnapshot>(Error::Validation);
+        if (!prompt) return failure<QuizSnapshot>(Error::Validation);
         snapshot.questions.push_back(*prompt);
-        snapshot.answerKey.push_back(*correct);
     }
     return success(std::move(snapshot));
+}
+Result<std::uint32_t> QuizService::grade(const Session& session, const QuizSnapshot& quiz,
+    const std::vector<char>& answers) const {
+    if (!session.authenticated() || session.isAdmin())
+        return failure<std::uint32_t>(Error::AccessDenied);
+    if (quiz.questions.empty() || answers.size() != quiz.questions.size())
+        return failure<std::uint32_t>(Error::Validation);
+    std::uint32_t correct = 0;
+    for (std::size_t i = 0; i < answers.size(); ++i) {
+        if (answers[i] < 'A' || answers[i] > 'D')
+            return failure<std::uint32_t>(Error::Validation);
+        const auto key = questions_.answerForGrading(quiz.questions[i].id);
+        if (!key) return failure<std::uint32_t>(Error::Validation);
+        if (answers[i] == *key) ++correct;
+    }
+    return success(correct);
 }
 std::string currentUtcTimestamp() {
     const std::time_t now = std::time(nullptr);
@@ -75,9 +88,9 @@ Error runLearnerQuiz(const Session& session, std::istream& input, std::ostream& 
                 return Error::Incomplete;
             }
         }
-        std::uint32_t correct = 0;
-        for (std::size_t i = 0; i < attempt.answers().size(); ++i)
-            if (attempt.answers()[i] == selected.value->answerKey[i]) ++correct;
+        const auto graded = quizzes.grade(session, *selected.value, attempt.answers());
+        if (!graded) return graded.error;
+        const std::uint32_t correct = *graded.value;
         const auto saved = attempts.submit(session, selected.value->title, currentUtcTimestamp(),
             correct, static_cast<std::uint32_t>(selected.value->questions.size()));
         if (!saved) {

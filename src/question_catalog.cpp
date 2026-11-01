@@ -49,7 +49,13 @@ const QuestionPrompt* QuestionCatalog::find(Id id) const {
     const auto it = questions_.find(id);
     return it == questions_.end() || !it->second.active ? nullptr : &it->second.prompt;
 }
-std::optional<char> QuestionCatalog::correctAnswer(Id id) const {
+std::optional<char> QuestionCatalog::correctAnswer(const Session& session, Id id) const {
+    if (!session.isAdmin()) return std::nullopt;
+    const auto it = questions_.find(id);
+    if (it == questions_.end() || !it->second.active) return std::nullopt;
+    return it->second.correctAnswer;
+}
+std::optional<char> QuestionCatalog::answerForGrading(Id id) const {
     const auto it = questions_.find(id);
     if (it == questions_.end() || !it->second.active) return std::nullopt;
     return it->second.correctAnswer;

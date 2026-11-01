@@ -62,7 +62,7 @@ void runQuestionMaintenance(const Session& session, QuestionCatalog& questions,
                 output << q.id << ": " << q.text << '\n';
                 for (std::size_t i = 0; i < q.choices.size(); ++i)
                     output << "  " << static_cast<char>('A' + i) << ". " << q.choices[i] << '\n';
-                output << "  Correct: " << questions.correctAnswer(q.id).value_or('?') << '\n';
+                output << "  Correct: " << questions.correctAnswer(session, q.id).value_or('?') << '\n';
             }
         } else if (choice.value == "2" || choice.value == "3") {
             QuestionPrompt prompt{};
