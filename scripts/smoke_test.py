@@ -1,4 +1,4 @@
-"""Exercise real registration, quiz discovery, submission and administrator summary flows."""
+"""Exercise real registration, quiz selection, submission, history and summary flows."""
 import os
 from pathlib import Path
 import subprocess
@@ -45,13 +45,20 @@ with tempfile.TemporaryDirectory(prefix="quiz-smoke-", dir="build") as directory
     )
 
     output = run(
-        [], "2\nalex\nlearner-test-password\n1\n1\nB\n2\n3\n"
+        [], "2\nalex\nlearner-test-password\n1\n1\nB\n3\n3\n"
     )
     assert "Available quizzes" in output and "Demo quiz" in output
     assert "Attempt saved." in output and "Score: 1/1" in output
     attempts = (data / "attempts.db").read_text()
     assert '"Demo quiz"' in attempts
     assert "learner-test-password" not in (data / "users.db").read_text()
+
+    output = run(
+        [], "2\nalex\nlearner-test-password\n2\n3\n3\n"
+    )
+    assert '"Demo quiz"' in output
+    assert "Other learner quiz" not in output
+    assert "Unsubmitted quiz" not in output
 
     output = run(
         [], "2\nowner\nsetup-test-password\n3\n4\n3\n"
@@ -73,4 +80,4 @@ with tempfile.TemporaryDirectory(prefix="quiz-smoke-", dir="build") as directory
     assert "learner-test-password" not in raw
     assert raw.count("$argon2id$") == 3
 
-print("PASS account restart, authenticated quiz discovery, completed submission, administrator summary, and credential storage")
+print("PASS account restart, authenticated quiz discovery, completed submission, learner-owned history, administrator summary, and credential storage")
