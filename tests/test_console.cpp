@@ -81,3 +81,34 @@ TEST(signin_quiz_input_and_logout_smoke_uses_the_same_console_on_both_platforms)
     REQUIRE(output.str().find("Quiz input complete.") != std::string::npos);
     REQUIRE(output.str().find("First?") != output.str().rfind("First?"));
 }
+
+TEST(console_invalid_main_choice_shows_correction_and_reprompts) {
+    TempDirectory temp;
+    quiz::PasswordHasher hasher;
+    quiz::FileAccountStore store(temp.path);
+    quiz::AuthService auth(store, hasher);
+    quiz::Console console(auth);
+    std::istringstream input("X\n1\nalex\nlearner-password\n3\n");
+    std::ostringstream output;
+    REQUIRE(console.run(input, output) == 0);
+    REQUIRE(output.str().find("accepted choices: 1, 2, or 3") != std::string::npos);
+    REQUIRE(output.str().find("Invalid choice. Please enter 1, 2, or 3.") != std::string::npos);
+    REQUIRE(store.find("alex") != nullptr);
+}
+
+TEST(console_invalid_authenticated_choice_shows_correction_and_reprompts) {
+    TempDirectory temp;
+    quiz::PasswordHasher hasher;
+    quiz::FileAccountStore store(temp.path);
+    quiz::AuthService auth(store, hasher);
+    REQUIRE(auth.registerLearner("alex", "learner-password"));
+    quiz::Console console(auth);
+    std::istringstream input("2\nalex\nlearner-password\nX\n2\n3\n");
+    std::ostringstream output;
+    REQUIRE(console.run(input, output) == 0);
+    REQUIRE(output.str().find("accepted choices: 1 or 2") != std::string::npos);
+    REQUIRE(output.str().find("Invalid choice. Please enter 1 or 2.") != std::string::npos);
+    const auto first = output.str().find("Learner menu");
+    REQUIRE(first != std::string::npos);
+    REQUIRE(output.str().find("Learner menu", first + 1) != std::string::npos);
+}

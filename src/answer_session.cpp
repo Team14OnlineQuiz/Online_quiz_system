@@ -20,11 +20,11 @@ bool AnswerSession::readNext(std::istream& input, std::ostream& output) {
         output << "Question " << position() + 1 << " of " << questions_.size() << ": " << q.text << '\n';
         for (std::size_t i = 0; i < q.choices.size(); ++i)
             output << static_cast<char>('A' + i) << ". " << q.choices[i] << '\n';
-        output << "Enter answer (uppercase A-D): " << std::flush;
+        output << "Choose one answer (accepted values: A, B, C, or D): " << std::flush;
         const auto line = readLine(input, 4);
         if (line.state == InputState::End) return false;
         if (line.state == InputState::Value && accept(line.value)) return true;
-        output << "Invalid answer. Enter exactly one uppercase letter: A, B, C, or D.\n";
+        output << "Invalid answer. Please enter exactly one uppercase letter: A, B, C, or D.\n";
     }
 }
 }

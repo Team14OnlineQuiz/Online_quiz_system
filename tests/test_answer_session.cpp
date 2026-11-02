@@ -44,3 +44,13 @@ TEST(oversized_answer_and_eof_preserve_attempt_state) {
     REQUIRE(attempt.position() == 1);
     REQUIRE(output.str().find("Invalid answer.") != std::string::npos);
 }
+
+TEST(answer_prompt_shows_accepted_values_and_specific_correction) {
+    quiz::AnswerSession attempt(questions());
+    std::istringstream input("X\nA\n");
+    std::ostringstream output;
+    REQUIRE(attempt.readNext(input, output));
+    REQUIRE(output.str().find("accepted values: A, B, C, or D") != std::string::npos);
+    REQUIRE(output.str().find("Invalid answer. Please enter exactly one uppercase letter: A, B, C, or D.") != std::string::npos);
+    REQUIRE(attempt.answers() == std::vector<char>{'A'});
+}
