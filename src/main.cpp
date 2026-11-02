@@ -1,7 +1,11 @@
 #include "quiz/console.h"
+#include "quiz/question_catalog.h"
 #include "quiz/result_service.h"
+#include "quiz/answer_session.h"
 #include <iostream>
 #include <algorithm>
+#include <vector>
+
 int main(int argc, char** argv) {
     try {
         std::filesystem::path data = "data";
@@ -33,12 +37,41 @@ int main(int argc, char** argv) {
             std::cerr << "Initialize the administrator first: quiz --init-admin [--data DIRECTORY]\n";
             return 1;
         }
+
         quiz::FileAttemptStore attempts(data);
         quiz::ResultService results(store, attempts);
-        quiz::Console console(auth, {}, [&](const quiz::Session& session, std::istream&, std::ostream& output) {
-            try { attempts.reload(); (void)results.displaySummary(session, output); }
-            catch (const std::exception&) { output << "Results unavailable; repair saved data.\n"; }
-        });
+        quiz::Console console(auth,
+            [&](const quiz::Session& session, std::istream& input, std::ostream& output) {
+                if (!session.authenticated() || session.isAdmin()) {
+                    output << "Quiz access denied.\n";
+                    return;
+                }
+                try {
+                    quiz::QuestionCatalog catalog(data);
+                    std::vector<quiz::QuestionPrompt> prompts;
+                    for (quiz::Id id = 1; id <= static_cast<quiz::Id>(catalog.size()); ++id) {
+                        const auto* question = catalog.find(id);
+                        if (question) prompts.push_back(*question);
+                    }
+                    if (prompts.empty()) {
+                        output << "No active questions are available.\n";
+                        return;
+                    }
+                    quiz::AnswerSession answerSession(std::move(prompts));
+                    output << "Starting quiz with " << answerSession.questionIds().size()
+                           << " questions.\n";
+                    while (!answerSession.complete()) {
+                        if (!answerSession.readNext(input, output)) return;
+                    }
+                    output << "All answers recorded. Quiz input complete.\n";
+                } catch (const std::exception&) {
+                    output << "Questions unavailable; check the saved question data and retry.\n";
+                }
+            },
+            [&](const quiz::Session& session, std::istream&, std::ostream& output) {
+                try { attempts.reload(); (void)results.displaySummary(session, output); }
+                catch (const std::exception&) { output << "Results unavailable; repair saved data.\n"; }
+            });
         return console.run(std::cin, std::cout);
     } catch (const std::exception& e) {
         std::cerr << "Unable to open quiz data: " << e.what() << '\n';

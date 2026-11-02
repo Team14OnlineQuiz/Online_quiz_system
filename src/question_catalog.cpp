@@ -5,6 +5,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <unordered_set>
+#include <map>
 namespace quiz {
 QuestionCatalog::QuestionCatalog(const std::filesystem::path& directory) {
     const auto file = directory / "questions.db";
@@ -40,5 +41,12 @@ QuestionCatalog::QuestionCatalog(const std::filesystem::path& directory) {
 const QuestionPrompt* QuestionCatalog::find(Id id) const {
     const auto it = prompts_.find(id);
     return it == prompts_.end() ? nullptr : &it->second;
+}
+std::vector<QuestionPrompt> QuestionCatalog::activeQuestions() const {
+    std::map<Id, QuestionPrompt> ordered(prompts_.begin(), prompts_.end());
+    std::vector<QuestionPrompt> result;
+    result.reserve(ordered.size());
+    for (const auto& entry : ordered) result.push_back(entry.second);
+    return result;
 }
 }
