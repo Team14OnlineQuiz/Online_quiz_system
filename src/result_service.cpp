@@ -54,6 +54,48 @@ void FileAttemptStore::reload() {
     if (input.bad()) throw std::runtime_error("Attempt read failed");
     attempts_.swap(staged);
 }
+Result<Id> FileAttemptStore::append(AttemptRecord attempt) {
+    const auto validTitle = [](const std::string& value) {
+        return !value.empty() && value.size() <= 512
+            && std::none_of(value.begin(), value.end(), [](unsigned char c) { return c < 32 || c == 127; });
+    };
+    if (!attempt.completed || attempt.userId == 0 || !validTitle(attempt.quizTitle)
+        || !validSubmissionDate(attempt.submittedAt) || attempt.totalQuestions == 0
+        || attempt.correctCount > attempt.totalQuestions)
+        return failure<Id>(Error::Validation);
+
+    Id nextId = 1;
+    for (const auto& saved : attempts_) {
+        if (saved.id == std::numeric_limits<Id>::max()) return failure<Id>(Error::Storage);
+        if (saved.id >= nextId) nextId = saved.id + 1;
+    }
+    attempt.id = nextId;
+
+    auto staged = attempts_;
+    staged.push_back(attempt);
+    auto stagedFile = file_;
+    stagedFile += ".tmp";
+
+    try {
+        std::ofstream output(stagedFile, std::ios::trunc);
+        if (!output) return failure<Id>(Error::Storage);
+        output << "QUIZ_ATTEMPTS_V1\n";
+        for (const auto& row : staged) {
+            output << row.id << ' ' << row.userId << ' ' << (row.completed ? 1 : 0) << ' '
+                << row.correctCount << ' ' << row.totalQuestions << ' '
+                << std::quoted(row.quizTitle) << ' ' << std::quoted(row.submittedAt) << '\n';
+        }
+        output.flush();
+        if (!output) return failure<Id>(Error::Storage);
+        output.close();
+        if (!output) return failure<Id>(Error::Storage);
+        replaceFile(stagedFile, file_);
+        attempts_.swap(staged);
+        return success(nextId);
+    } catch (...) {
+        return failure<Id>(Error::Storage);
+    }
+}
 Result<std::vector<SummaryRow>> ResultService::summary(const Session& session) const {
     if (!session.isAdmin()) return failure<std::vector<SummaryRow>>(Error::AccessDenied);
     std::unordered_map<Id, std::string> usernames;

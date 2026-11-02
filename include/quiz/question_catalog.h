@@ -8,8 +8,10 @@ class QuestionCatalog {
 public:
     explicit QuestionCatalog(const std::filesystem::path& directory);
     const QuestionPrompt* find(Id id) const;
+    char correctChoice(Id id) const;
     std::size_t size() const { return prompts_.size(); }
 private:
     std::unordered_map<Id, QuestionPrompt> prompts_;
+    std::unordered_map<Id, char> answerKeys_;
 };
 }

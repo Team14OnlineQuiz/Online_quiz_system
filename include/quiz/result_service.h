@@ -15,12 +15,17 @@ class AttemptStore {
 public:
     virtual ~AttemptStore() = default;
     virtual const std::vector<AttemptRecord>& attempts() const = 0;
+    virtual Result<Id> append(AttemptRecord attempt) {
+        (void)attempt;
+        return failure<Id>(Error::Storage);
+    }
 };
 class FileAttemptStore final : public AttemptStore {
 public:
     explicit FileAttemptStore(std::filesystem::path directory);
     void reload();
     const std::vector<AttemptRecord>& attempts() const override { return attempts_; }
+    Result<Id> append(AttemptRecord attempt) override;
 private:
     std::filesystem::path file_;
     std::vector<AttemptRecord> attempts_;

@@ -9,8 +9,19 @@ AnswerSession::AnswerSession(std::vector<QuestionPrompt> questions) : questions_
     }
 }
 bool AnswerSession::accept(const std::string& input) {
-    if (complete() || input.size() != 1 || input[0] < 'A' || input[0] > 'D') return false;
+    if (submitted_ || complete() || input.size() != 1 || input[0] < 'A' || input[0] > 'D') return false;
     answers_.push_back(input[0]);
+    return true;
+}
+std::vector<Id> AnswerSession::questionIds() const {
+    std::vector<Id> ids;
+    ids.reserve(questions_.size());
+    for (const auto& question : questions_) ids.push_back(question.id);
+    return ids;
+}
+bool AnswerSession::markSubmitted() {
+    if (!complete() || submitted_) return false;
+    submitted_ = true;
     return true;
 }
 bool AnswerSession::readNext(std::istream& input, std::ostream& output) {
