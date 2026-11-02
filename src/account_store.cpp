@@ -61,7 +61,9 @@ const User* FileAccountStore::find(const std::string& username) const {
     return it == users_.end() ? nullptr : &*it;
 }
 Result<Id> FileAccountStore::insert(std::string username, std::string hash, Role role) {
-    if (!validUsername(username) || !PasswordHasher::validEncoding(hash)) return failure<Id>(Error::Validation);
+    if (!validUsername(username) || !PasswordHasher::validEncoding(hash)
+        || (role != Role::Learner && role != Role::Admin))
+        return failure<Id>(Error::Validation);
     if (find(username)) return failure<Id>(Error::DuplicateUser);
     Id id = 1;
     for (const auto& user : users_) {
