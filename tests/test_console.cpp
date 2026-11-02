@@ -3,6 +3,7 @@
 #include "quiz/console.h"
 #include "quiz/answer_session.h"
 #include <sstream>
+
 TEST(console_registration_signin_and_logout_use_real_saved_accounts) {
     TempDirectory temp;
     quiz::PasswordHasher hasher;
@@ -19,6 +20,7 @@ TEST(console_registration_signin_and_logout_use_real_saved_accounts) {
     quiz::FileAccountStore restarted(temp.path);
     REQUIRE(restarted.find("alex") != nullptr);
 }
+
 TEST(invalid_credentials_never_display_authenticated_menus) {
     TempDirectory temp;
     quiz::PasswordHasher hasher;
@@ -35,6 +37,7 @@ TEST(invalid_credentials_never_display_authenticated_menus) {
         REQUIRE(output.str().find("Administrator menu") == std::string::npos);
     }
 }
+
 TEST(admin_actions_receive_an_authenticated_admin_session) {
     TempDirectory temp;
     quiz::PasswordHasher hasher;
@@ -43,19 +46,47 @@ TEST(admin_actions_receive_an_authenticated_admin_session) {
     REQUIRE(auth.provisionFirstAdmin("owner", "admin-password"));
     bool invoked = false;
     quiz::Console console(auth, {}, [&](const quiz::Session& s, std::istream&, std::ostream&) {
-        REQUIRE(s.isAdmin()); invoked = true;
+        REQUIRE(s.isAdmin());
+        invoked = true;
     });
-    std::istringstream input("2\nowner\nadmin-password\n1\n2\n3\n");
+    std::istringstream input("2\nowner\nadmin-password\n2\n3\n3\n");
     std::ostringstream output;
     REQUIRE(console.run(input, output) == 0);
     REQUIRE(invoked);
 }
+
+TEST(admin_question_management_action_receives_admin_session) {
+    TempDirectory temp;
+    quiz::PasswordHasher hasher;
+    quiz::FileAccountStore store(temp.path);
+    quiz::AuthService auth(store, hasher);
+    REQUIRE(auth.provisionFirstAdmin("owner", "admin-password"));
+
+    bool invoked = false;
+    quiz::Console console(
+        auth,
+        {},
+        {},
+        [&](const quiz::Session& session, std::istream&, std::ostream&) {
+            REQUIRE(session.isAdmin());
+            invoked = true;
+        }
+    );
+
+    std::istringstream input("2\nowner\nadmin-password\n1\n3\n3\n");
+    std::ostringstream output;
+
+    REQUIRE(console.run(input, output) == 0);
+    REQUIRE(invoked);
+}
+
 TEST(oversized_input_is_drained_and_eof_exits) {
     std::istringstream input(std::string(100000, 'x') + "\nA\n");
     REQUIRE(quiz::readLine(input, 16).state == quiz::InputState::Invalid);
     REQUIRE(quiz::readLine(input, 16).value == "A");
     REQUIRE(quiz::readLine(input, 16).state == quiz::InputState::End);
 }
+
 TEST(signin_quiz_input_and_logout_smoke_uses_the_same_console_on_both_platforms) {
     TempDirectory temp;
     quiz::PasswordHasher hasher;
