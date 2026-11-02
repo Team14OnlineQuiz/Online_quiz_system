@@ -45,7 +45,7 @@ TEST(admin_actions_receive_an_authenticated_admin_session) {
     quiz::Console console(auth, {}, [&](const quiz::Session& s, std::istream&, std::ostream&) {
         REQUIRE(s.isAdmin()); invoked = true;
     });
-    std::istringstream input("2\nowner\nadmin-password\n1\n2\n3\n");
+    std::istringstream input("2\nowner\nadmin-password\n3\n4\n3\n");
     std::ostringstream output;
     REQUIRE(console.run(input, output) == 0);
     REQUIRE(invoked);

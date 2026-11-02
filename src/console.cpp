@@ -2,19 +2,36 @@
 namespace quiz {
 bool Console::authenticatedMenu(Session& session, std::istream& input, std::ostream& output) {
     while (session.authenticated()) {
-        if (session.isAdmin()) output << "Administrator menu\n1 Results summary\n2 Logout\n";
-        else output << "Learner menu\n1 Take quiz\n2 Logout\n";
-        output << "Enter choice (1-2): " << std::flush;
+        if (session.isAdmin())
+            output << "Administrator menu\n1 Manage questions\n2 Manage quizzes\n3 Results summary\n4 Logout\n";
+        else output << "Learner menu\n1 Browse and take quizzes\n2 Logout\n";
+        output << (session.isAdmin() ? "Enter choice (1-4): " : "Enter choice (1-2): ") << std::flush;
         const auto choice = readLine(input, 16);
         if (choice.state == InputState::End) { auth_.signOut(session); return false; }
-        if (choice.state == InputState::Value && choice.value == "2") { auth_.signOut(session); break; }
-        if (choice.state != InputState::Value || choice.value != "1") {
-            output << "Invalid choice. Enter 1 or 2.\n"; continue;
+        if (choice.state == InputState::Value && choice.value == (session.isAdmin() ? "4" : "2")) {
+            auth_.signOut(session); break;
+        }
+        if (choice.state != InputState::Value ||
+            (session.isAdmin() ? (choice.value != "1" && choice.value != "2" && choice.value != "3")
+                               : choice.value != "1")) {
+            output << (session.isAdmin() ? "Invalid choice. Enter 1, 2, 3, or 4.\n"
+                                         : "Invalid choice. Enter 1 or 2.\n");
+            continue;
         }
         if (session.isAdmin()) {
-            if (summary_) summary_(session, input, output); else output << "No completed attempts.\n";
+            if (choice.value == "1") {
+                if (questions_) questions_(session, input, output);
+                else output << "Question management unavailable.\n";
+            } else if (choice.value == "2") {
+                if (quizzes_) quizzes_(session, input, output);
+                else output << "Quiz management unavailable.\n";
+            } else {
+                if (summary_) summary_(session, input, output);
+                else output << "No completed attempts.\n";
+            }
         } else {
-            if (takeQuiz_) takeQuiz_(session, input, output); else output << "No quizzes available.\n";
+            if (takeQuiz_) takeQuiz_(session, input, output);
+            else output << "No quizzes available.\n";
         }
     }
     return true;
