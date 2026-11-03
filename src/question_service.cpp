@@ -72,7 +72,7 @@ void QuestionService::loadQuestions() {
     std::unordered_set<Id> ids;
 
     while (std::getline(input, line)) {
-        if (line.size() > 21000) {
+        if (line.size() > 42000) {
             throw std::runtime_error("Oversized question record");
         }
 

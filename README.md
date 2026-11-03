@@ -1,6 +1,6 @@
 # Online Quiz System
 
-C++17 console application using the selected Deliverable 1 baseline. The root SRS v1.1 describes an older scope; \`docs/implementation-baseline.md\` records the differences.
+C++17 console application using the selected Deliverable 1 baseline. See [the implementation baseline](docs/implementation-baseline.md) for the current scope. Earlier specifications, diagrams, and the pre-integration validation report are in [docs/legacy](docs/legacy).
 
 ## Build
 
@@ -8,29 +8,29 @@ Install a C++17 compiler and the official libsodium development library. Passwor
 
 Windows with MinGW and the official libsodium win64 archive:
 
-\`\`\`powershell
+```powershell
 $env:SODIUM_ROOT = 'C:\path\to\libsodium-win64'
 ./scripts/build.ps1
 ./build/quiz_tests.exe
 python scripts/smoke_test.py
 ./build/quiz.exe
-\`\`\`
+```
 
 Linux:
 
-\`\`\`bash
+```bash
 sudo apt-get install g++ pkg-config libsodium-dev
 bash scripts/build.sh
 ./build/quiz_tests
 python3 scripts/smoke_test.py
 ./build/quiz
-\`\`\`
+```
 
 Build output and runtime data stay out of Git.
 
 ## First use
 
-Run \`build/quiz --init-admin\` (\`build/quiz.exe --init-admin\` on Windows) once in an empty data directory. Enter an administrator username and password at the prompts. There is no default administrator password, and passwords are never passed as command-line arguments. Run the application normally to register learners and sign in. \`--data DIRECTORY\` selects another local data directory.
+Run `build/quiz --init-admin` (`build/quiz.exe --init-admin` on Windows) once in an empty data directory. Enter an administrator username and password at the prompts. There is no default administrator password, and passwords are never passed as command-line arguments. Run the application normally to register learners and sign in. `--data DIRECTORY` selects another local data directory.
 
 ## Learner workflow
 
@@ -57,11 +57,11 @@ The controller checks the authenticated role before dispatching administrator ac
 
 All files are versioned UTF-8 files stored under the selected data directory:
 
-- \`users.db\` — accounts and encoded Argon2id hashes.
-- \`questions.db\` — question text, options, answer key, and active flag.
-- \`quizzes.db\` — stable quiz IDs, titles, and ordered question references.
-- \`attempts.db\` — completed attempt snapshots, owner ID, quiz title, UTC date, and score.
+- `users.db` — accounts and encoded Argon2id hashes.
+- `questions.db` — question text, options, answer key, and active flag.
+- `quizzes.db` — stable quiz IDs, titles, and ordered question references.
+- `attempts.db` — completed attempt snapshots, owner ID, quiz title, UTC date, and score.
 
-Storage adapters stage writes to a sibling \`.tmp\` file and commit using the platform replacement adapter. In-memory records change only after successful replacement. See [storage-format.md](docs/storage-format.md).
+Storage adapters stage writes to a sibling `.tmp` file and commit using the platform replacement adapter. In-memory records change only after successful replacement. See [storage-format.md](docs/storage-format.md).
 
 See [Akshath Iteration 1 implementation](docs/akshath-iteration-1.md), [Akshay Iteration 1](docs/iteration-1.md), [Akshay Iteration 2](docs/iteration-2.md), and [performance measurements](docs/performance.md). GitHub Actions compiles with warnings treated as errors, runs requirement tests, executes the real console smoke test, and checks the benchmark on Linux and Windows.

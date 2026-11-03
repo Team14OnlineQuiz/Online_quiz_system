@@ -1,7 +1,7 @@
 name: C++ build and requirements tests
 on:
   push:
-    branches: [main, 'akshay-iteration-*', 'akshath-iteration-*']
+    branches: [main, 'akshay-iteration-*', 'akshath-iteration-*', 'integration/quiz-backend']
   pull_request:
   workflow_dispatch:
 permissions:

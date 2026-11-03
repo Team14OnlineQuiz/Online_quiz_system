@@ -12,9 +12,9 @@ bool validQuestion(const QuestionPrompt& prompt, char correctAnswer) {
         return !value.empty() && value.size() <= limit
             && std::none_of(value.begin(), value.end(), [](unsigned char c) { return c < 32 || c == 127; });
     };
-    return validText(prompt.text, 200) && correctAnswer >= 'A' && correctAnswer <= 'D'
+    return validText(prompt.text, 4096) && correctAnswer >= 'A' && correctAnswer <= 'D'
         && std::all_of(prompt.choices.begin(), prompt.choices.end(),
-            [&](const std::string& choice) { return validText(choice, 100); });
+            [&](const std::string& choice) { return validText(choice, 4096); });
 }
 QuestionCatalog::QuestionCatalog(const std::filesystem::path& directory) : file_(directory / "questions.db") {
     if (!std::filesystem::exists(file_)) return;
@@ -24,7 +24,7 @@ QuestionCatalog::QuestionCatalog(const std::filesystem::path& directory) : file_
     if (!std::getline(input, line) || line != "QUIZ_QUESTIONS_V1")
         throw std::runtime_error("Invalid questions.db header");
     while (std::getline(input, line)) {
-        if (line.size() > 21000) throw std::runtime_error("Oversized question record");
+        if (line.size() > 42000) throw std::runtime_error("Oversized question record");
         long long id = 0;
         int active = -1;
         char correct = 0;

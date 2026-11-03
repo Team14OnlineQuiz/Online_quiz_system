@@ -14,17 +14,19 @@ QuizCatalog::QuizCatalog(const std::filesystem::path& directory, const QuestionC
     std::ifstream input(file_);
     if (!input) throw std::runtime_error("Cannot read quizzes.db");
     std::string line;
-    if (!std::getline(input, line) || line != "QUIZ_QUIZZES_V1")
+    if (!std::getline(input, line) || (line != "QUIZ_QUIZZES_V1" && line != "QUIZ_DEFINITIONS_V1"))
         throw std::runtime_error("Invalid quizzes.db header");
+    const bool legacy = line == "QUIZ_DEFINITIONS_V1";
     std::unordered_set<Id> ids;
     while (std::getline(input, line)) {
         if (line.size() > 8192) throw std::runtime_error("Oversized quiz record");
         long long id = 0;
-        int active = -1;
+        int active = 1;
         std::size_t count = 0;
         QuizDefinition quiz{};
         std::istringstream record(line);
-        if (!(record >> id >> active >> std::quoted(quiz.title) >> count) || count == 0 || count > 100)
+        if (!(record >> id) || (!legacy && !(record >> active))
+            || !(record >> std::quoted(quiz.title) >> count) || count == 0 || count > 100)
             throw std::runtime_error("Malformed quiz record");
         quiz.questionIds.reserve(count);
         for (std::size_t i = 0; i < count; ++i) {
@@ -36,6 +38,7 @@ QuizCatalog::QuizCatalog(const std::filesystem::path& directory, const QuestionC
         record >> std::ws;
         if (!record.eof() || id <= 0 || (active != 0 && active != 1)
             || quiz.title.empty() || quiz.title.size() > 120
+            || std::any_of(quiz.title.begin(), quiz.title.end(), [](unsigned char c) { return c < 32 || c == 127; })
             || !ids.insert(static_cast<Id>(id)).second)
             throw std::runtime_error("Invalid quiz record");
         std::unordered_set<Id> unique(quiz.questionIds.begin(), quiz.questionIds.end());

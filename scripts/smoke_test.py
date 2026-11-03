@@ -30,14 +30,12 @@ with tempfile.TemporaryDirectory(prefix="quiz-smoke-", dir="build") as directory
         [], "1\nblair\nlearner-test-password\n3\n"
     )
 
-    (data / "questions.db").write_text(
-        'QUIZ_QUESTIONS_V1\n'
-        '1 1 B "What is 2 + 2?" "3" "4" "5" "6"\n'
+    output = run(
+        [], "2\nowner\nsetup-test-password\n1\n2\nWhat is 2 + 2?\n3\n4\n5\n6\nB\n5\n"
+            "2\n2\nDemo quiz\n1\n5\n4\n3\n"
     )
-    (data / "quizzes.db").write_text(
-        'QUIZ_QUIZZES_V1\n'
-        '1 1 "Demo quiz" 1 1\n'
-    )
+    assert "Question created. ID: 1" in output, output
+    assert "Quiz identifier: 1" in output, output
     (data / "attempts.db").write_text(
         'QUIZ_ATTEMPTS_V1\n'
         '1 3 1 1 2 "Other learner quiz" "2026-10-20T10:00:00Z"\n'
@@ -45,10 +43,11 @@ with tempfile.TemporaryDirectory(prefix="quiz-smoke-", dir="build") as directory
     )
 
     output = run(
-        [], "2\nalex\nlearner-test-password\n1\n1\nB\n3\n3\n"
+        [], "2\nalex\nlearner-test-password\n1\n1\nX\nB\n3\n3\n"
     )
     assert "Available quizzes" in output and "Demo quiz" in output
     assert "Attempt saved." in output and "Score: 1/1" in output
+    assert "Percentage: 100.0%" in output and "Invalid answer." in output, output
     attempts = (data / "attempts.db").read_text()
     assert '"Demo quiz"' in attempts
     assert "learner-test-password" not in (data / "users.db").read_text()

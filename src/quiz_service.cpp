@@ -4,6 +4,7 @@
 #include <charconv>
 #include <ctime>
 #include <iomanip>
+#include <algorithm>
 #include <sstream>
 namespace quiz {
 Result<std::vector<QuizListing>> QuizService::discover(const Session& session) const {
@@ -12,8 +13,11 @@ Result<std::vector<QuizListing>> QuizService::discover(const Session& session) c
     const auto definitions = quizzes_.learnerList(session);
     if (!definitions) return failure<std::vector<QuizListing>>(definitions.error);
     std::vector<QuizListing> result;
-    for (const auto& quiz : *definitions.value)
-        result.push_back({quiz.id, quiz.title, quiz.questionIds.size()});
+    for (const auto& quiz : *definitions.value) {
+        if (std::all_of(quiz.questionIds.begin(), quiz.questionIds.end(),
+                [&](Id id) { return questions_.find(id) != nullptr; }))
+            result.push_back({quiz.id, quiz.title, quiz.questionIds.size()});
+    }
     return success(std::move(result));
 }
 Result<QuizSnapshot> QuizService::select(const Session& session, Id quizId) const {
@@ -101,6 +105,10 @@ Error runLearnerQuiz(const Session& session, std::istream& input, std::ostream& 
         }
         output << "Attempt saved.\nQuiz: " << selected.value->title << "\nScore: "
             << correct << '/' << selected.value->questions.size() << '\n';
+        std::ostringstream percentage;
+        percentage << std::fixed << std::setprecision(1)
+            << (100.0 * correct / selected.value->questions.size());
+        output << "Percentage: " << percentage.str() << "%\n";
         return Error::None;
     }
 }

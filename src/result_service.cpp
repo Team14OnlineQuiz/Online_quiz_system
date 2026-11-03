@@ -106,10 +106,14 @@ Result<std::vector<SummaryRow>> ResultService::summary(const Session& session) c
     for (const auto& user : accounts_.users()) usernames.emplace(user.id, user.username);
     std::vector<SummaryRow> rows;
     for (const auto& attempt : attempts_.attempts()) {
-        if (!attempt.completed) continue;
         const auto owner = usernames.find(attempt.userId);
-        if (owner == usernames.end() || attempt.totalQuestions == 0 || attempt.correctCount > attempt.totalQuestions)
+        if (owner == usernames.end() || attempt.id == 0 || attempt.totalQuestions == 0
+            || attempt.correctCount > attempt.totalQuestions || attempt.quizTitle.empty()
+            || attempt.quizTitle.size() > 512 || !validSubmissionDate(attempt.submittedAt)
+            || std::any_of(attempt.quizTitle.begin(), attempt.quizTitle.end(),
+                [](unsigned char c) { return c < 32 || c == 127; }))
             return failure<std::vector<SummaryRow>>(Error::Storage);
+        if (!attempt.completed) continue;
         rows.push_back({owner->second, attempt.quizTitle, attempt.submittedAt, attempt.correctCount,
             attempt.totalQuestions, 100.0 * attempt.correctCount / attempt.totalQuestions});
     }

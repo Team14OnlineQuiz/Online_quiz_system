@@ -4,7 +4,7 @@ bool Console::authenticatedMenu(Session& session, std::istream& input, std::ostr
     while (session.authenticated()) {
         if (session.isAdmin()) {
             output << "Administrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\n";
-            output << "Enter choice (1-4): " << std::flush;
+            output << "Enter choice (1-4; accepted choices: 1, 2, 3, or 4): " << std::flush;
             const auto choice = readLine(input, 16);
             if (choice.state == InputState::End) { auth_.signOut(session); return false; }
             if (choice.state == InputState::Value && choice.value == "4") {
@@ -12,7 +12,7 @@ bool Console::authenticatedMenu(Session& session, std::istream& input, std::ostr
             }
             if (choice.state != InputState::Value
                 || (choice.value != "1" && choice.value != "2" && choice.value != "3")) {
-                output << "Invalid choice. Enter 1, 2, 3, or 4.\n"; continue;
+                output << "Invalid choice. Please enter 1, 2, 3, or 4.\n"; continue;
             }
             if (!session.isAdmin()) { output << "Access denied.\n"; continue; }
             if (choice.value == "1") {
@@ -27,14 +27,14 @@ bool Console::authenticatedMenu(Session& session, std::istream& input, std::ostr
             }
         } else {
             output << "Learner menu\n1 Take quiz\n2 View my completed history\n3 Logout\n";
-            output << "Enter choice (1-3): " << std::flush;
+            output << "Enter choice (1-3; accepted choices: 1, 2, or 3): " << std::flush;
             const auto choice = readLine(input, 16);
             if (choice.state == InputState::End) { auth_.signOut(session); return false; }
             if (choice.state == InputState::Value && choice.value == "3") {
                 auth_.signOut(session); break;
             }
             if (choice.state != InputState::Value && choice.state != InputState::Invalid) {
-                output << "Invalid choice. Enter 1, 2, or 3.\n"; continue;
+                output << "Invalid choice. Please enter 1, 2, or 3.\n"; continue;
             }
             if (choice.value == "1") {
                 if (takeQuiz_) takeQuiz_(session, input, output);
@@ -43,18 +43,18 @@ bool Console::authenticatedMenu(Session& session, std::istream& input, std::ostr
                 if (!session.authenticated() || session.isAdmin()) output << "Access denied.\n";
                 else if (history_) history_(session, input, output);
                 else output << "No completed attempts.\n";
-            } else output << "Invalid choice. Enter 1, 2, or 3.\n";
+            } else output << "Invalid choice. Please enter 1, 2, or 3.\n";
         }
     }
     return true;
 }
 int Console::run(std::istream& input, std::ostream& output) {
     while (true) {
-        output << "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3): " << std::flush;
+        output << "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): " << std::flush;
         const auto choice = readLine(input, 16);
         if (choice.state == InputState::End || (choice.state == InputState::Value && choice.value == "3")) return 0;
         if (choice.state != InputState::Value || (choice.value != "1" && choice.value != "2")) {
-            output << "Invalid choice. Enter 1, 2, or 3.\n"; continue;
+            output << "Invalid choice. Please enter 1, 2, or 3.\n"; continue;
         }
         output << "Username (1-128 characters): " << std::flush;
         const auto username = readLine(input, 128);

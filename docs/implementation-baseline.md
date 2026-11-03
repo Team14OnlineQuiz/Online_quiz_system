@@ -2,7 +2,7 @@
 
 The team selected the attached Deliverable 1 (version 1.0, 28 September 2026) when creating issues FR-01 to FR-11, NFR-01 to NFR-04, and SEC-01 to SEC-04. Those issue descriptions are the implementation acceptance criteria.
 
-The repository root SRS and architecture markdown describe a different, older scope: participant names, no learner history, the first ten bank questions, and no third-party libraries. Their requirement and test identifiers are not interchangeable with the selected attachment.
+The archived SRS and architecture documents in `docs/legacy` describe a different, older scope: participant names, no learner history, the first ten bank questions, and no third-party libraries. Their requirement and test identifiers are not interchangeable with the selected attachment.
 
 The selected attachment explicitly requires a vetted adaptive hashing library. This implementation uses official libsodium's Argon2id API with independent random salts and interactive cost parameters (64 MiB memory). Encoded hashes retain algorithm, salt, and cost parameters. There is no plaintext-password storage or custom hash implementation.
 

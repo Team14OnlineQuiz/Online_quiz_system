@@ -1,5 +1,6 @@
 #include "test.h"
 #include "quiz/question_catalog.h"
+#include "quiz/auth_service.h"
 #include "quiz/answer_session.h"
 #include <fstream>
 #include <sstream>
@@ -20,7 +21,13 @@ TEST(question_catalog_presents_active_questions_in_id_order_once) {
     REQUIRE(catalog.find(2) == nullptr);
     REQUIRE(catalog.find(3) != nullptr);
 
-    auto prompts = catalog.activeQuestions();
+    quiz::FileAccountStore accounts(temp.path);
+    quiz::PasswordHasher hasher;
+    quiz::AuthService auth(accounts, hasher);
+    REQUIRE(auth.provisionFirstAdmin("owner", "admin-password"));
+    const auto admin = auth.signIn("owner", "admin-password");
+    REQUIRE(admin);
+    auto prompts = catalog.list(*admin.value);
     REQUIRE(prompts.size() == 2);
     REQUIRE(prompts[0].id == 1);
     REQUIRE(prompts[1].id == 3);

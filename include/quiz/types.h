@@ -7,7 +7,7 @@
 namespace quiz {
 using Id = std::uint64_t;
 enum class Role { Learner, Admin };
-enum class Error { None, Validation, DuplicateUser, Storage, Authentication, AccessDenied, Incomplete, UnknownQuestion, QuizUnavailable };
+enum class Error { None, Validation, DuplicateUser, Storage, Authentication, AccessDenied, Incomplete };
 template<class T> struct Result {
     std::optional<T> value;
     Error error = Error::None;
