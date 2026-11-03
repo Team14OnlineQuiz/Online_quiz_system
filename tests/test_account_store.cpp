@@ -43,3 +43,16 @@ TEST(malformed_role_never_becomes_an_administrator) {
     try { quiz::FileAccountStore bad(temp.path); } catch (const std::runtime_error&) { rejected = true; }
     REQUIRE(rejected);
 }
+
+
+TEST(account_store_rejects_unknown_role_values) {
+    TempDirectory temp;
+    quiz::PasswordHasher hasher;
+    quiz::FileAccountStore store(temp.path);
+    const auto invalidRole = static_cast<quiz::Role>(99);
+    const auto result = store.insert("intruder", hasher.hash("test-password"), invalidRole);
+    REQUIRE(!result);
+    REQUIRE(result.error == quiz::Error::Validation);
+    REQUIRE(store.users().empty());
+    REQUIRE(store.find("intruder") == nullptr);
+}

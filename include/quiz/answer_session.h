@@ -13,8 +13,12 @@ public:
     std::size_t position() const { return answers_.size(); }
     bool complete() const { return answers_.size() == questions_.size(); }
     const std::vector<char>& answers() const { return answers_; }
+    std::vector<Id> questionIds() const;
+    bool submitted() const { return submitted_; }
+    bool markSubmitted();
 private:
     std::vector<QuestionPrompt> questions_;
     std::vector<char> answers_;
+    bool submitted_ = false;
 };
 }

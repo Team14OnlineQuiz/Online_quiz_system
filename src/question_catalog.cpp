@@ -33,12 +33,19 @@ QuestionCatalog::QuestionCatalog(const std::filesystem::path& directory) {
             || !validText(prompt.text) || !std::all_of(prompt.choices.begin(), prompt.choices.end(), validText)
             || !ids.insert(static_cast<Id>(id)).second) throw std::runtime_error("Invalid question record");
         prompt.id = static_cast<Id>(id);
-        if (active == 1) prompts_.emplace(prompt.id, std::move(prompt));
+        if (active == 1) {
+            answerKeys_.emplace(prompt.id, correct);
+            prompts_.emplace(prompt.id, std::move(prompt));
+        }
     }
     if (input.bad()) throw std::runtime_error("Question read failed");
 }
 const QuestionPrompt* QuestionCatalog::find(Id id) const {
     const auto it = prompts_.find(id);
     return it == prompts_.end() ? nullptr : &it->second;
+}
+char QuestionCatalog::correctChoice(Id id) const {
+    const auto it = answerKeys_.find(id);
+    return it == answerKeys_.end() ? '\0' : it->second;
 }
 }

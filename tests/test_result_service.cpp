@@ -65,3 +65,26 @@ TEST(attempt_adapter_rejects_invalid_scores_and_reads_completed_snapshots) {
     REQUIRE(!quiz::validSubmissionDate("2026-02-30T10:00:00Z"));
     REQUIRE(quiz::validSubmissionDate("2028-02-29T10:00:00Z"));
 }
+
+
+TEST(result_summary_rejects_unknown_account_references) {
+    TempDirectory temp;
+    quiz::PasswordHasher hasher;
+    quiz::FileAccountStore accounts(temp.path);
+    quiz::AuthService auth(accounts, hasher);
+    REQUIRE(auth.provisionFirstAdmin("owner", "setup-password"));
+    const auto admin = auth.signIn("owner", "setup-password");
+    REQUIRE(admin);
+
+    MemoryAttempts attempts;
+    attempts.values = {
+        {1, 999, "Unknown owner", "2026-10-20T10:00:00Z", 2, 3, true}
+    };
+
+    quiz::ResultService results(accounts, attempts);
+    REQUIRE(results.summary(*admin.value).error == quiz::Error::Storage);
+
+    // Incomplete records with unknown owners must also be rejected.
+    attempts.values[0].completed = false;
+    REQUIRE(results.summary(*admin.value).error == quiz::Error::Storage);
+}
