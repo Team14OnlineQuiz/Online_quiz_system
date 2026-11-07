@@ -46,6 +46,22 @@ let editor = null;
 let filters = {subject:'All subjects',grade:'',search:''};
 let renderNumber = 0;
 
+function confirmAction(message) {
+  return new Promise(resolve => {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'confirm-dialog';
+    dialog.innerHTML = `<h2>Please confirm</h2><p>${E(message)}</p><div class="confirm-actions"><button class="btn secondary" data-choice="cancel">Cancel</button><button class="btn primary" data-choice="confirm">Continue</button></div>`;
+    document.body.append(dialog);
+    const finish = value => { dialog.close(); dialog.remove(); resolve(value); };
+    dialog.addEventListener('click', event => {
+      const choice = event.target.closest('[data-choice]')?.dataset.choice;
+      if (choice) finish(choice === 'confirm');
+    });
+    dialog.addEventListener('cancel', event => { event.preventDefault(); finish(false); });
+    dialog.showModal();
+  });
+}
+
 async function api(path, options={}) {
   const response = await fetch('/api/' + path, {
     ...options,
@@ -72,9 +88,9 @@ function toast(message) {
   toast.timer = setTimeout(() => box.style.display='none', 4200);
 }
 
-function go(path) {
+async function go(path) {
   if (run && !path.startsWith('/quiz/')) {
-    if (!confirm('Leave this quiz? Your unfinished answers will be discarded.')) return;
+    if (!await confirmAction('Leave this quiz? Your unfinished answers will be discarded.')) return;
     run = null;
   }
   history.pushState({},'',path);
@@ -150,7 +166,7 @@ function dashboard() {
 
 function quizCard(q) {
   const admin = user.role==='admin';
-  return `<article class="quiz-card"><div class="quiz-cover ${subjectClass(q.subject)}"><span class="pill">${E(q.subject)}</span>${icon(subjectKey(q.subject))}</div><div class="quiz-card-body"><h3>${E(q.title)}</h3><p>${E(q.description)}</p><div class="quiz-meta"><span>${icon('book')}${q.count} questions</span><span>${icon('clock')}${q.minutes} min</span><span>Grade ${q.grade}</span></div><div class="card-bottom"><small>3 question formats</small>${admin?`<div class="admin-actions"><a class="btn subtle" href="/admin/edit/${q.id}">Edit quiz</a><button data-action="archive" data-id="${q.id}" aria-label="Archive ${E(q.title)} grade ${q.grade}">Archive</button></div>`:`<button class="btn subtle" data-action="start" data-id="${q.id}">Start quiz ${icon('arrow')}</button>`}</div></div></article>`;
+  return `<article class="quiz-card"><div class="quiz-cover ${subjectClass(q.subject)}"><span class="pill">${E(q.subject)}</span>${icon(subjectKey(q.subject))}</div><div class="quiz-card-body"><h3>${E(q.title)}</h3><p>${E(q.description)}</p><div class="quiz-meta"><span>${icon('book')}${q.count} questions</span><span>${icon('clock')}${q.minutes} min</span><span>Grade ${q.grade}</span></div><div class="card-bottom"><small>${q.types.length} question format${q.types.length===1?'':'s'}</small>${admin?`<div class="admin-actions"><a class="btn subtle" href="/admin/edit/${q.id}">Edit quiz</a><button data-action="archive" data-id="${q.id}" aria-label="Archive ${E(q.title)} grade ${q.grade}">Archive</button></div>`:`<button class="btn subtle" data-action="start" data-id="${q.id}">Start quiz ${icon('arrow')}</button>`}</div></div></article>`;
 }
 
 function catalogue() {
@@ -160,13 +176,13 @@ function catalogue() {
     `<section class="catalog-hero"><div><span class="eyebrow">SOMETHING FOR EVERY CURIOUS MIND</span><h2>Find your next “aha!” moment.</h2><p>Four subjects. Seven grades. Endless possibilities to grow.</p></div><div class="catalog-emblem">✦</div></section>
     <div class="filters"><label class="search-filter">${icon('search')}<input id="quiz-search" aria-label="Search quiz library" placeholder="Search a topic or quiz…" value="${E(filters.search)}"></label><select id="grade-filter" aria-label="Filter by grade"><option value="">All grades</option>${Array.from({length:7},(_,i)=>`<option value="${i+6}" ${filters.grade==i+6?'selected':''}>Grade ${i+6}</option>`).join('')}</select><button class="text-btn" data-action="reset-filters">Reset filters</button></div>
     <div class="subject-tabs" role="group" aria-label="Filter by subject">${['All subjects','Mathematics','Science','English','Computing'].map(s=>`<button class="${filters.subject===s?'active':''}" aria-pressed="${filters.subject===s}" data-action="filter-subject" data-subject="${s}">${s}</button>`).join('')}</div>
-    <div class="section-head"><h2>${filters.subject==='All subjects'?'Explore the collection':E(filters.subject)}</h2><span class="muted" id="results-count">${results.length} quizzes</span></div><div class="quiz-grid" id="quiz-grid">${results.map(quizCard).join('')||emptyState('No quizzes found','Try another subject, grade, or search term.')}</div>`);
+    <div class="section-head"><h2>${filters.subject==='All subjects'?'Explore the collection':E(filters.subject)}</h2><span class="muted" id="results-count">${results.length} quiz${results.length===1?'':'zes'}</span></div><div class="quiz-grid" id="quiz-grid">${results.map(quizCard).join('')||emptyState('No quizzes found','Try another subject, grade, or search term.')}</div>`);
 }
 
 function filterResults() {
   const selected = quizzes.filter(q=>(filters.subject==='All subjects'||q.subject===filters.subject)&&(!filters.grade||q.grade===Number(filters.grade))&&(`${q.title} ${q.subject} ${q.description}`.toLowerCase().includes(filters.search.toLowerCase())));
   document.querySelector('#quiz-grid').innerHTML = selected.map(quizCard).join('')||emptyState('No quizzes found','Try another subject, grade, or search term.');
-  document.querySelector('#results-count').textContent = selected.length+' quizzes';
+  document.querySelector('#results-count').textContent = selected.length+(selected.length===1?' quiz':' quizzes');
 }
 
 function progressPage() {
@@ -301,7 +317,7 @@ app.addEventListener('click', async event=>{
     } else if (action==='exit-quiz') {
       go('/quizzes');
     } else if (action==='archive') {
-      if (!confirm('Archive this quiz? Existing attempt results will remain available.')) return;
+      if (!await confirmAction('Archive this quiz? Existing attempt results will remain available.')) return;
       await api('admin/quizzes/'+button.dataset.id,{method:'DELETE'});
       toast('Quiz archived.'); await render();
     } else if (action==='add-question') {
