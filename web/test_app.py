@@ -106,6 +106,33 @@ def test_progress_uses_owned_persisted_results(app):
     assert admin.get('/api/progress').json['count'] == 13
 
 
+def test_admin_attempt_review_identifies_learner_and_keeps_all_answer_keys(app):
+    learner = app.test_client()
+    headers = register(learner)
+    run = learner.post('/api/quizzes/1/start', headers=headers).json
+    submission = learner.post(f"/api/runs/{run['run_id']}/submit",
+                              json={'answers':['0.75','False','40']}, headers=headers)
+    url = '/api/attempts/' + str(submission.json['attempt_id'])
+    assert 'learner' not in learner.get(url).json
+
+    admin = app.test_client()
+    login(admin, True)
+    review = admin.get(url).json
+    assert review['learner']['name'] == 'New learner'
+    assert review['learner']['email'] == 'new@example.test'
+    assert review['learner']['grade'] == 10
+    assert 'password' not in review['learner']
+    assert review['title'] == 'Number sense'
+    assert review['grade'] == 6
+    assert [q['selected'] for q in review['review']] == ['0.75','False','40']
+    assert [q['answer'] for q in review['review']] == ['0.75','True','40']
+    assert [q['correct'] for q in review['review']] == [True,False,True]
+
+    stranger = app.test_client()
+    register(stranger, 'stranger@example.test')
+    assert stranger.get(url).status_code == 404
+
+
 def test_admin_edits_and_archives_preserve_inflight_and_completed_snapshots(app):
     learner = app.test_client()
     headers = register(learner)

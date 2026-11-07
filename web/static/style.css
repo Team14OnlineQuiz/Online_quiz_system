@@ -2,3 +2,14 @@
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
 .confirm-dialog{border:1px solid var(--line);border-radius:15px;padding:28px;max-width:420px;width:90vw;color:var(--ink);box-shadow:0 20px 80px #2223}.confirm-dialog::backdrop{background:#24223f66;backdrop-filter:blur(3px)}.confirm-dialog p{font-size:13px;color:var(--muted);margin:18px 0 24px}.confirm-actions{display:flex;gap:10px;justify-content:flex-end}.nav a{white-space:nowrap;gap:9px}
+
+.admin-attempt-summary{margin-bottom:26px}
+.admin-attempt-summary h2{font-size:23px;margin-top:10px}
+.attempt-details{display:grid;grid-template-columns:1fr 1fr;gap:20px;border-top:1px solid var(--line);padding-top:20px;margin:20px 0 0}
+.attempt-details dt{font-size:10px;color:var(--muted);margin-bottom:7px}
+.attempt-details dd{font-size:13px;margin:0;overflow-wrap:anywhere}
+.answer-comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.answer-comparison .review-answer{display:flex;flex-direction:column;gap:7px;overflow-wrap:anywhere}
+.answer-comparison .review-answer span{font-size:10px;color:var(--muted)}
+.answer-comparison .correct-answer{background:#edf8f2}
+@media(max-width:650px){.attempt-details,.answer-comparison{grid-template-columns:1fr}.admin-attempt-summary .section-head{align-items:flex-start;flex-direction:column}.admin-attempt-summary .section-head p{overflow-wrap:anywhere}}

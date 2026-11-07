@@ -140,7 +140,7 @@ function statsCards() {
 
 function recentAttempts(limit=3) {
   if (!progress.attempts.length) return emptyState('Your first quiz is waiting','Complete a quiz to start building your learning story.',true);
-  return `<div class="attempt-list">${progress.attempts.slice(0,limit).map(a=>`<a class="attempt-row" href="/results/${a.id}">${subjectIcon(a.subject)}<div><h3>${E(a.title)}</h3><p>${E(a.subject)} · Grade ${a.grade} · ${dateText(a.submitted)}</p></div><div class="score">${Math.round(100*a.score/a.total)}%<small>${a.score} of ${a.total} correct</small></div></a>`).join('')}</div>`;
+  return `<div class="attempt-list">${progress.attempts.slice(0,limit).map(a=>`<a class="attempt-row" href="/results/${a.id}">${subjectIcon(a.subject)}<div><h3>${E(a.title)}</h3><p>${user.role==='admin'?E(a.name)+' · ':''}${E(a.subject)} · Grade ${a.grade} · ${dateText(a.submitted)}</p></div><div class="score">${Math.round(100*a.score/a.total)}%<small>${a.score} of ${a.total} correct</small></div></a>`).join('')}</div>`;
 }
 
 function activityBars(large=false) {
@@ -201,6 +201,38 @@ function quizRunner() {
 
 function resultsPage(result) {
   const percent = Math.round(100*result.score/result.total);
+  if (user.role === 'admin') {
+    const learner = result.learner;
+    const submitted = new Date(result.submitted).toLocaleString('en-US', {
+      dateStyle:'medium', timeStyle:'short', timeZone:'UTC'
+    });
+    const review = result.review.map((q, i) => `
+      <article class="review-card">
+        <span class="pill ${q.correct?'green':'orange'}">${icon(q.correct?'check':'close')}${q.correct?'Correct':'Incorrect'} · Question ${i+1}</span>
+        <h3>${E(q.prompt)}</h3>
+        <div class="answer-comparison">
+          <div class="review-answer"><span>Student’s answer</span><strong>${E(q.selected)}</strong></div>
+          <div class="review-answer correct-answer"><span>Correct answer</span><strong>${E(q.answer)}</strong></div>
+        </div>
+        <p>${E(q.explanation)}</p>
+      </article>`).join('');
+    shell('Student attempt review', `<div class="runner">
+      ${heading('Student attempt review','See who attempted the quiz and how each answer was graded.',
+        `<a class="text-btn" href="/progress">${icon('back')} Back to class analytics</a>`)}
+      <section class="panel admin-attempt-summary">
+        <div class="section-head"><div><span class="eyebrow">COMPLETED ATTEMPT #${result.id}</span><h2>${E(learner.name)}</h2><p>${E(learner.email)} · Learner grade ${learner.grade}</p></div><span class="pill ${percent>=70?'green':'orange'}">${percent}% · ${result.score}/${result.total} correct</span></div>
+        <dl class="attempt-details">
+          <div><dt>Quiz attempted</dt><dd>${E(result.title)}</dd></div>
+          <div><dt>Subject & quiz grade</dt><dd>${E(result.subject)} · Grade ${result.grade}</dd></div>
+          <div><dt>Submitted</dt><dd>${E(submitted)} UTC</dd></div>
+          <div><dt>Time spent</dt><dd>${Math.max(1,Math.ceil(result.seconds/60))} min</dd></div>
+        </dl>
+      </section>
+      <div class="section-head"><h2>Question-by-question review</h2><span class="muted">${result.total} answers</span></div>
+      ${review}
+    </div>`);
+    return;
+  }
   shell('Quiz results',`<div class="runner"><section class="result-summary"><span class="eyebrow">ANOTHER STEP FORWARD</span><div class="score-ring" style="--score:${percent}%"><strong>${percent}%</strong></div><h1>${percent>=70?'Look at you go!':'Keep growing. You’re getting there.'}</h1><p>${E(result.title)} · ${E(result.subject)} · Grade ${result.grade}<br>${result.score} out of ${result.total} correct · ${Math.max(1,Math.ceil(result.seconds/60))} min · ${dateText(result.submitted)}</p><div class="result-actions"><a class="btn primary" href="/quizzes">Explore more quizzes ${icon('arrow')}</a><a class="btn secondary" href="/progress">${icon('chart')} View progress</a></div></section><div class="section-head"><h2>A little reflection goes a long way.</h2><span class="muted">Your answer review</span></div>${result.review.map((q,i)=>`<article class="review-card"><span class="pill ${q.correct?'green':'orange'}">${icon(q.correct?'check':'spark')}${q.correct?'Correct':'Keep practising'} · Question ${i+1}</span><h3>${E(q.prompt)}</h3><div class="review-answer">Your answer <strong>${E(q.selected)}</strong>${q.correct?'':`<br>Correct answer <strong>${E(q.answer)}</strong>`}</div><p>${E(q.explanation)}</p></article>`).join('')}</div>`);
 }
 
