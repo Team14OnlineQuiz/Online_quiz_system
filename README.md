@@ -1,5 +1,17 @@
 # Online Quiz System
 
+## Web application — Iteration 3
+
+Quizora provides a browser-based learner dashboard, subject and grade quiz discovery, three question formats, administrator quiz management, and personal progress analytics. See [web/README.md](web/README.md) for setup, demo accounts, data storage, and validation.
+
+```powershell
+python -m venv .venv
+.venv/Scripts/python -m pip install -r web/requirements.txt
+.venv/Scripts/python -m web.app --demo
+```
+
+Open <http://127.0.0.1:5000>. The console application instructions follow.
+
 C++17 console application using the selected Deliverable 1 baseline. See [the implementation baseline](docs/implementation-baseline.md) for the current scope. Earlier specifications, diagrams, and the pre-integration validation report are in [docs/legacy](docs/legacy).
 
 ## Build
