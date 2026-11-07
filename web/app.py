@@ -252,6 +252,10 @@ def create_app(data_dir=None, testing=False):
         result = dict(row)
         result['review'] = json.loads(result['review'])
         result.pop('run_id')
+        if g.user['role'] == 'admin':
+            learner = db().execute('SELECT id,name,email,grade FROM users WHERE id=?',
+                                   (row['user_id'],)).fetchone()
+            result['learner'] = dict(learner)
         return jsonify(result)
 
     @app.get('/api/progress')
