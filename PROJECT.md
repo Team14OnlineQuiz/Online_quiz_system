@@ -15,7 +15,7 @@ Team 14's project supports student quiz practice and teacher assessment. This pa
 | Evaluation checklist | [Evidence index](docs/evaluation/README.md) |
 | Presentation and viva | [40-45 minute walkthrough](docs/evaluation/walkthrough.md) / [Individual contribution guide](docs/presentation-guide.md) |
 | Backlog and issues | [Team14Project](https://github.com/orgs/Team14OnlineQuiz/projects/1) / [SRS-to-issue mapping](docs/evaluation/backlog-traceability.md) |
-| Build and test automation | [GitHub Actions](https://github.com/Team14OnlineQuiz/Online_quiz_system/actions) |
+| CI integration | [CI setup below](#continuous-integration-ci) / [GitHub Actions](https://github.com/Team14OnlineQuiz/Online_quiz_system/actions) |
 
 ## What the application does
 
@@ -69,6 +69,23 @@ Recorded on **17 November 2026**. These are measured reports for the documented 
 Line coverage measures executed lines; branch coverage measures exercised decision outcomes. C++ and Python tools have different branch definitions. Coverage excludes frontend JavaScript/CSS and third-party libraries; C++ exception/unreachable-branch exclusions are documented. Passing tests do not imply complete coverage.
 
 **To view the HTML reports:** download/extract the repository or evaluation pack, then open `docs/reports/cpp-coverage.html` and `docs/reports/web/index.html` in a browser. GitHub's file viewer displays HTML source rather than running the report interface.
+
+## Continuous integration (CI)
+
+GitHub Actions automatically builds and tests changes on pushes to `main` and when pull requests are opened or updated. The C++ workflow also runs for the configured iteration/integration branches and supports manual dispatch; the web workflow also runs for `iteration-3/**` pushes.
+
+| Workflow | Platforms | Automated checks |
+| --- | --- | --- |
+| [C++ build and requirements tests](.github/workflows/cpp.yml) | Linux and Windows (MSYS2/UCRT64) | Install compiler/libsodium, compile C++17 with warnings treated as errors, run 51 requirement tests, smoke-test the real executable, and verify the p95 performance limit at the required data volume |
+| [Quizora web checks](.github/workflows/web.yml) | Linux and Windows | Install Python dependencies, run 15 pytest cases covering authentication/roles/grading/ownership/persistence/concurrent submissions, and check browser JavaScript syntax with Node.js |
+
+Both workflows passed for commit `8664554` when checked on 17 November 2026: [C++ run](https://github.com/Team14OnlineQuiz/Online_quiz_system/actions/runs/44027873760) and [web run](https://github.com/Team14OnlineQuiz/Online_quiz_system/actions/runs/44027872446). Each run preserves its commit, job steps, result and logs.
+
+To demonstrate CI, open a pull request's **Checks** tab or the repository's **Actions** tab, select a workflow run, and open its Linux/Windows job logs. A failed build, test assertion, JavaScript syntax check or benchmark makes the corresponding check fail; the owner can inspect the log, fix the change and rerun the checks. Whether a check blocks merging depends on separately configured repository rules.
+
+Coverage collection is a separate reproducible operation using [scripts/collect_evidence.py](scripts/collect_evidence.py). The checked-in HTML/JSON/XML reports are recorded snapshots; the current workflows rerun the checks above rather than publishing fresh coverage reports. The demonstrated website runs locally; automatic deployment is outside these CI workflows.
+
+Presentation explanation: "We integrated GitHub Actions with our repository so changes are built and tested automatically. Both the console and website are checked on Windows and Linux. This provides repeatable feedback on a commit or pull request before integration and helps identify regressions."
 
 ## Security and data integrity
 
