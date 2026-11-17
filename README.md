@@ -1,5 +1,9 @@
 # Online Quiz System
 
+## Project documents
+
+Deliverable 1 is available in separate files: [SRS](Deliverable1/SRS.md), [test cases](Deliverable1/Test_Cases.md), and [architecture and design specification (SAD)](Deliverable1/SAD.md). These preserve the original console baseline. See the [document index](Deliverable1/README.md) for scope and the original source, and the [presentation guide](docs/presentation-guide.md) for the current website demo and individual contributions.
+
 ## Web application — Iteration 3
 
 Quizora provides a browser-based learner dashboard, subject and grade quiz discovery, three question formats, administrator quiz management, and personal progress analytics. See [web/README.md](web/README.md) for setup, demo accounts, data storage, and validation.

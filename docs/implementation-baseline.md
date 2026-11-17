@@ -10,4 +10,4 @@ Reference: https://doc.libsodium.org/password_hashing/default_phf
 
 Windows validation uses the official libsodium 1.0.22 MinGW archive, SHA-256 `1d99e0afaf27bce664249232e9dc628ae6bb7b49f0ab53ad6db372b028a35d9d`. The archive and compiler binaries are not committed.
 
-Shared types and repository interfaces are integration foundations for other members' stories. Adding an interface or fixture does not mean their assigned issues are completed. The console remains local and single-user; there is no HTTP service, browser frontend, or network quiz play.
+Shared types and repository interfaces are integration foundations for other members' stories. Adding an interface or fixture does not mean their assigned issues are completed. The original console application remains local and single-user. Iteration 3 adds a separate Flask browser application with its own SQLite storage; see [web/README.md](../web/README.md). The original Deliverable 1 is available as separate [SRS](../Deliverable1/SRS.md), [test cases](../Deliverable1/Test_Cases.md), and [SAD](../Deliverable1/SAD.md) files.
