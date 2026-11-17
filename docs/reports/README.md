@@ -6,7 +6,7 @@ Recorded 17 November 2026 against production source at `ad39b8f`, with evidence-
 | --- | --- | --- |
 | C++ requirement tests | 51 tests, 0 failures | [Test log](cpp-tests.txt) |
 | Real executable smoke | Passed | [Smoke log](cpp-smoke.txt) |
-| Original acceptance scenarios | TC-01 to TC-12 passed within recorded boundaries | [Detailed observations/transcripts](acceptance-results.json) |
+| Original acceptance scenarios | TC-01 to TC-12 passed within recorded boundaries | [Expected/actual tables](../../Deliverable1/Test_Cases.md), [printable PDF](test-case-observations.pdf), [detailed observations/transcripts](acceptance-results.json) |
 | Web tests | 15 passed, 0 failures | [JUnit report](web-junit.xml) |
 | C++ line coverage | 80.9% (926/1145) | [HTML](cpp-coverage.html), [JSON](cpp-coverage.json), [XML](cpp-coverage.xml) |
 | C++ branch coverage | 65.8% (1291/1961) | Same C++ coverage report |

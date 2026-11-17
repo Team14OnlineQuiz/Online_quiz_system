@@ -55,26 +55,83 @@ Entry: build/dependencies available; isolated writable test data; original requi
 
 Windows laptop; GCC/gcov 14.2.0; C++17; official libsodium 1.0.22. Coverage builds use `-O0 -g --coverage`; the separate normal `-O2` benchmark is used for latency. C++ tests use the repository's lightweight `TEST`/`REQUIRE` harness, not GoogleTest. CLI scenarios use Python subprocess assertions. Web tests use Python 3.12.14, pytest 9.2.0, Flask's test client, pytest-cov 7.1.0, and coverage.py 7.17.3. C++ reports use gcovr 8.8. Exact commands/platform details: [environment.json](../docs/reports/environment.json).
 
-## 6 Cases, expected outcomes, and actual results
+## 6 Executed test cases: expected and actual results
 
-The original preconditions, actions, expected results, and FR/NFR trace columns remain in [the before-testing plan](Test_Plan_v1_Before.md). This table records execution evidence; it does not replace those expected outcomes.
+Execution evidence recorded on **17 November 2026**. Actual results below describe observed output, persisted state, measured timings, and executed unit/CI checks. [Recorded observations and CLI transcripts](../docs/reports/acceptance-results.json), [C++ test log](../docs/reports/cpp-tests.txt), and [performance output](../docs/reports/performance.txt) support the results. The [before-testing plan](Test_Plan_v1_Before.md) retains the original expected-only cases.
 
-| Case | Status | Actual observation and evidence boundary |
-| --- | --- | --- |
-| TC-01 | PASS | Valid accounts persisted; repeating alex was rejected without changing the accounts file. |
-| TC-02 | PASS | Wrong name/password used the same failure; valid login succeeded; three same-password accounts had distinct salts and no plaintext password. |
-| TC-03 | PASS | Executed direct-service authorization unit test passed; learner CLI displayed no administrator menu. |
-| TC-04 | PASS | Empty question prompt and unknown quiz reference were rejected; valid three-question fixture reloaded after process restart. |
-| TC-05 | PASS | Quiz listed with three questions; each was displayed once; A,C,B produced a saved 3/3 result. |
-| TC-06 | PASS | X repeated question 1; the valid A advanced it; subsequent questions were displayed once. |
-| TC-07 | PASS | A,D,B against A,C,B produced exactly one completed attempt, 2/3 and 66.7%. |
-| TC-08 | PASS | Separate learner logins returned only the respective 3/3 or 2/3 result; direct ownership-denial test passed. |
-| TC-09 | PASS | Administrator saw both named learners; unit tests denied learner, guest, and logged-out sessions. |
-| TC-10 | PASS | Recorded executed unit tests preserve committed files after injected write failure and reject malformed account/attempt records. |
-| TC-11 | PASS | 40 samples per operation at the planned volume: menu p95 445.705 ms; question p95 0.0187 ms; both <= 2000 ms. |
-| TC-12 | PASS | Local Windows instrumented build and real CLI smoke passed. Previously completed main CI at the recorded source base passed Windows and Linux: https://github.com/Team14OnlineQuiz/Online_quiz_system/actions/runs/44013570777 |
+### TC-01  Register learner
 
-Detailed real-executable transcripts and supporting-test boundaries: [acceptance-results.json](../docs/reports/acceptance-results.json).
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Empty data; username alex | Register alex with a valid 8 character password, then repeat username | First succeeds; duplicate rejected; one account stored | The eight-character registration unit test created one learner and reloaded it successfully. The CLI displayed "Learner account saved."; repeating alex displayed "Username already exists." and left users.db unchanged. | PASS | FR-01, FR-11 |
+
+### TC-02  Authenticate and protect password
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Seed learner alex | Sign in with wrong then right password; inspect account file | Wrong pair denied with generic message; right pair accepted; no plaintext password stored and unique salt exists | Wrong username and wrong password both displayed "Invalid credentials." Valid credentials displayed the learner menu. Inspection found three distinct Argon2id salts for three same-password accounts and no plaintext password. | PASS | FR-02, SEC-01 |
+
+### TC-03  Deny unauthorized authoring
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Learner session active | Invoke create question and create quiz operations | Both return access denied; no question or quiz change persists | Direct create-question and create-quiz calls from learner/guest sessions returned AccessDenied. No question or quiz was added by those calls. The learner CLI displayed no administrator menu. | PASS | FR-03, FR-04, SEC-02 |
+
+### TC-04  Validate authoring and configuration
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Admin session; one active question | Try empty option and unknown question reference, then create valid question and quiz | Invalid entries rejected; valid data saved and reloaded after restart | The unit test rejected an empty answer option without saving a question. The CLI rejected an empty prompt and unknown question ID 9999. Three valid questions and the configured quiz were visible after restarting the process. | PASS | FR-03, FR-04, FR-11 |
+
+### TC-05  Browse and complete attempt
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Learner; 3 question quiz with key A C B | List quizzes; choose quiz; enter A C B | Quiz listed with count 3; each question displayed once; 3 answers stored | The catalogue listed "Acceptance fixture" with 3 questions. Each of the three questions appeared once. Answers A,C,B produced "Attempt saved." and "Score: 3/3". | PASS | FR-05, FR-06 |
+
+### TC-06  Recover from bad choice
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Attempt on first question | Enter X, then A | X rejected with guidance; same question reappears; only A recorded | Entering X displayed "Invalid answer." and repeated question 1. A then advanced to question 2. Question 1 appeared twice, while each following question appeared once; invalid X was not recorded. | PASS | FR-07, NFR-03 |
+
+### TC-07  Score known answers
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| 3 question quiz with key A C B | Answer A D B and submit | 2 of 3 correct; displayed percentage 66.7%; one completed result | Against key A,C,B, submitting A,D,B displayed "Attempt saved." once, "Score: 2/3", and "Percentage: 66.7%". Exactly one completed result was reported. | PASS | FR-08 |
+
+### TC-08  Enforce result ownership
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Two learners each with one result | As learner A request history; attempt internal access to B history | Only A records returned; B records denied | Alex history showed only the 3/3 result; Blair history showed only the 2/3 result. A direct request by Alex for Blair history returned AccessDenied in the recorded ownership test. | PASS | FR-09, SEC-03 |
+
+### TC-09  Administrator summary
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Two completed learner results | As admin open summary, then as learner attempt same operation | Admin sees both results; learner is denied | The administrator summary included named results for alex (3/3) and blair (2/3). Learner, guest and logged-out administrator calls returned AccessDenied in the recorded summary tests. | PASS | FR-10, SEC-02 |
+
+### TC-10  Storage failure and malformed data
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Disposable data directory | Inject write failure; restart using malformed account record | Failure reported; prior committed data readable; malformed record rejected without creating admin session | Fault-injection tests kept the committed account, question, quiz and attempt files byte-for-byte unchanged and readable after restart. Malformed role and invalid attempt-score records were rejected without creating an administrator session. | PASS | NFR-02, SEC-04 |
+
+### TC-11  Response time at load
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| 1,000 questions and 10,000 attempts | Measure at least 20 menu and question loads | 95th percentile is at most 2 seconds on the documented machine | With 1,000 questions and 10,000 attempts, 40 samples per operation gave menu p95 = 445.705 ms and question p95 = 0.0187 ms. Both were below the 2,000 ms limit. | PASS | NFR-01 |
+
+### TC-12  Cross platform build
+
+| Precondition | Action | Expected result | Actual result observed | Status | Trace |
+| --- | --- | --- | --- | --- | --- |
+| Windows and Linux C++17 toolchains | Build and execute one sign in and quiz smoke test on each | Both compile and complete smoke test using documented commands | The local Windows build and real-executable smoke test passed. The recorded main CI run also completed the C++17 build and sign-in/quiz smoke tests successfully on both Windows and Linux. Linux evidence comes from CI, not a local laptop run. | PASS | NFR-04 |
+
+**Evidence boundaries:** TC-01 includes the executed eight-character registration unit test; TC-04 includes the executed empty-option validation unit test. TC-03, TC-08, TC-09 and TC-10 combine CLI observations with direct-service/fault-injection tests. TC-12 uses the [recorded Windows/Linux CI run](https://github.com/Team14OnlineQuiz/Online_quiz_system/actions/runs/44013570777) alongside the local Windows build and smoke test.
 
 Additional web cases are recorded in [web-junit.xml](../docs/reports/web-junit.xml). Their named tests cover session/CSRF/roles, hashed persistence, mixed grading/idempotency/ownership, progress, administrator student review, edit/archive snapshots, seven invalid editor inputs, concurrent submission, and unknown endpoints/security headers. This yields 15 executed cases because one validation test is parameterized.
 
