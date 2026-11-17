@@ -1,0 +1,5 @@
+NFR-01: questions=1000 attempts=10000 samples_per_operation=40
+Compiler: 14.2.0
+OS: Windows
+menu_p95_ms=445.705 question_p95_ms=0.0187
+Raw measurements: build/performance.csv

@@ -1,0 +1,515 @@
+{
+  "checked_utc": "2026-11-17",
+  "issues": [
+    {
+      "number": 36,
+      "title": "[IT3-05] Build administrator quiz management and validate the web release",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "As an administrator, I want to publish subject/grade quizzes and review class activity.\n\nAcceptance criteria\n- Admin home shows aggregate activity and a quiz editor with all supported question types.\n- Administrators can create, edit, and archive quizzes with validation.\n- Automated tests cover authorization, grading, persistence, and analytics.\n- Browser checks cover login, filters, quiz completion, progress, and mobile layout.\n- Documentation and CI support the web app.\n\nIteration 3 · 8 story points · High priority",
+      "created_at": "2026-11-07T05:37:05Z",
+      "closed_at": "2026-11-07T05:59:43Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/36"
+    },
+    {
+      "number": 35,
+      "title": "[IT3-04] Add personal progress analytics and attempt history",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "As a learner, I want a progress page that shows my actual performance over time and by subject.\n\nAcceptance criteria\n- Display accuracy, attempts, study time, activity chart, and subject performance from persisted attempts.\n- History links to owned result reviews.\n- New users see truthful empty states and attempts are isolated between accounts.\n\nIteration 3 · 5 story points · High priority",
+      "created_at": "2026-11-07T05:37:04Z",
+      "closed_at": "2026-11-07T05:59:43Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/35"
+    },
+    {
+      "number": 34,
+      "title": "[IT3-03] Deliver multiple question types and server-graded quiz attempts",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "As a learner, I want multiple-choice, true/false, and short-answer questions with a review of my results.\n\nAcceptance criteria\n- Ordered quiz runner supports all three types, progress, back/next, and unanswered validation.\n- Server grades answers and persists one attempt per submitted run.\n- Result review shows explanations and correct answers only after submission.\n- Answer keys are omitted from learner quiz responses.\n\nIteration 3 · 8 story points · High priority",
+      "created_at": "2026-11-07T05:37:03Z",
+      "closed_at": "2026-11-07T05:59:42Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/34"
+    },
+    {
+      "number": 33,
+      "title": "[IT3-02] Create learner home and subject/grade quiz discovery",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "As a learner, I want a clear home page and a searchable quiz library filtered by subject and grades 6–12.\n\nAcceptance criteria\n- Responsive dashboard shows recent activity and recommended quizzes.\n- Subject, grade, and search filters work together with empty states.\n- Accessible navigation works on mobile and desktop.\n\nIteration 3 · 5 story points · High priority",
+      "created_at": "2026-11-07T05:37:01Z",
+      "closed_at": "2026-11-07T05:59:42Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/33"
+    },
+    {
+      "number": 32,
+      "title": "[IT3-01] Build secure web authentication and role-based navigation",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "As a learner or administrator, I want to sign in to the website and reach the correct home page.\n\nAcceptance criteria\n- Registration creates learner accounts with securely hashed passwords.\n- Login, logout, session checks, and role-specific navigation work.\n- Administrator endpoints reject learner access.\n- Requests that change data validate CSRF protection.\n\nIteration 3 · 5 story points · High priority",
+      "created_at": "2026-11-07T05:36:29Z",
+      "closed_at": "2026-11-07T05:59:41Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/32"
+    },
+    {
+      "number": 19,
+      "title": "[SEC-04] Validate local records before loading application data",
+      "state": "closed",
+      "assignees": [
+        "Advitha-M"
+      ],
+      "labels": [
+        "Security Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nValidate local data before constructing domain objects. Reject malformed records with a recoverable error; never interpret them as privileged accounts or valid scores.\n\n## Acceptance criteria\n\n- [ ] Validate schema, required fields, enum values, and domain constraints.\n- [ ] Reject malformed account and result records with recovery guidance.\n- [ ] Malformed accounts cannot create administrator sessions.\n- [ ] Malformed results cannot become valid completed scores.\n\n## Planning\n\n- **Requirement:** SEC-04\n- **Priority:** High\n- **Estimate:** 5 story points\n- **Iteration:** Iteration 2\n\n## Verification\n\nTC-10, extended with malformed result records in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:59:33Z",
+      "closed_at": "2026-11-02T16:51:09Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/19"
+    },
+    {
+      "number": 18,
+      "title": "[SEC-03] Enforce ownership when retrieving learner results",
+      "state": "closed",
+      "assignees": [
+        "AkshathGirishShriolkar"
+      ],
+      "labels": [
+        "Security Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nDerive the history owner from the authenticated session and verify ownership on every own-history request. Do not accept an arbitrary owner ID from console input.\n\n## Acceptance criteria\n\n- [ ] Derive learner identity from the session.\n- [ ] Every returned attempt belongs to that learner.\n- [ ] Deny internal attempts to access another learner history.\n- [ ] Console input cannot select another owner ID.\n\n## Planning\n\n- **Requirement:** SEC-03\n- **Priority:** High\n- **Estimate:** 3 story points\n- **Iteration:** Iteration 2\n\n## Verification\n\nTC-08 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:59:16Z",
+      "closed_at": "2026-11-01T07:21:14Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/18"
+    },
+    {
+      "number": 17,
+      "title": "[SEC-02] Enforce authorization on every administrator operation",
+      "state": "closed",
+      "assignees": [
+        "AkshathGirishShriolkar"
+      ],
+      "labels": [
+        "Security Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nCheck the authenticated role on every administrator operation. Enforce checks in the controller and independently in services so direct internal calls cannot bypass authorization.\n\n## Acceptance criteria\n\n- [ ] Question maintenance, quiz configuration, and aggregate results require an administrator.\n- [ ] Deny learner and unauthenticated controller calls.\n- [ ] Deny direct unauthorized service calls without changing stored state.\n\n## Planning\n\n- **Requirement:** SEC-02\n- **Priority:** High\n- **Estimate:** 3 story points\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-03 and TC-09, including direct service calls in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:58:56Z",
+      "closed_at": "2026-11-01T07:21:12Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/17"
+    },
+    {
+      "number": 16,
+      "title": "[SEC-01] Protect stored passwords with salted adaptive hashing",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Security Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nUse a vetted password-hashing library with an adaptive algorithm such as Argon2id and a unique random salt per account. Never persist plaintext passwords.\n\n## Acceptance criteria\n\n- [ ] Store adaptive hashes with independently generated random salts.\n- [ ] Two accounts using the same password have independent salts.\n- [ ] Verify passwords through the vetted library.\n- [ ] Persisted records contain no plaintext passwords.\n\n## Planning\n\n- **Requirement:** SEC-01\n- **Priority:** High\n- **Estimate:** 5 story points\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-02 and two-account salt inspection in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:58:33Z",
+      "closed_at": "2026-11-01T05:24:53Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/16"
+    },
+    {
+      "number": 15,
+      "title": "[NFR-04] Support documented C++17 builds on Windows and Linux",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Non-functional Requirement",
+        "priority: medium"
+      ],
+      "body": "## Description\n\nDocument C++17 build commands for supported Windows and Linux environments. Isolate platform-specific file handling in the repository adapter.\n\n## Acceptance criteria\n\n- [ ] Record compiler versions, operating systems, and build commands.\n- [ ] Compile and run sign-in and quiz smoke tests on Windows and Linux as required by the attached test plan.\n- [ ] Confine platform-specific file handling to the repository adapter.\n\n## Planning\n\n- **Requirement:** NFR-04\n- **Priority:** Medium\n- **Estimate:** 5 story points\n- **Iteration:** Iteration 2\n\n## Verification\n\nTC-12 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:58:10Z",
+      "closed_at": "2026-11-01T05:45:41Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/15"
+    },
+    {
+      "number": 14,
+      "title": "[NFR-03] Provide clear prompts and recoverable input errors",
+      "state": "closed",
+      "assignees": [
+        "Advitha-M"
+      ],
+      "labels": [
+        "Non-functional Requirement",
+        "priority: medium"
+      ],
+      "body": "## Description\n\nShow accepted input values at every menu and question prompt. Give a specific correction prompt for invalid choices and continue without crashing.\n\n## Acceptance criteria\n\n- [ ] Every menu and question prompt identifies accepted input values.\n- [ ] Invalid choices produce a specific correction prompt.\n- [ ] The application remains usable and re-prompts after invalid input.\n\n## Planning\n\n- **Requirement:** NFR-03\n- **Priority:** Medium\n- **Estimate:** 2 story points\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-06 and prompt review in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:57:53Z",
+      "closed_at": "2026-11-02T16:58:59Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/14"
+    },
+    {
+      "number": 13,
+      "title": "[NFR-02] Preserve committed data when file writes fail",
+      "state": "closed",
+      "assignees": [
+        "AkshathGirishShriolkar"
+      ],
+      "labels": [
+        "Non-functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nReport file-write failures while retaining a readable last committed data file. Use a temporary file and atomic replacement where supported by the operating system.\n\n## Acceptance criteria\n\n- [ ] Use a temporary file and atomic replacement on supported platforms.\n- [ ] An injected write failure leaves the prior committed file readable.\n- [ ] Restart recovers the committed state and the failed write is not reported as successful.\n\n## Planning\n\n- **Requirement:** NFR-02\n- **Priority:** High\n- **Estimate:** 5 story points\n- **Iteration:** Iteration 2\n\n## Verification\n\nTC-10 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:57:23Z",
+      "closed_at": "2026-11-01T07:21:05Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/13"
+    },
+    {
+      "number": 12,
+      "title": "[NFR-01] Meet the local response-time target at the specified data volume",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Non-functional Requirement",
+        "priority: medium"
+      ],
+      "body": "## Description\n\nWith up to 1,000 stored questions and 10,000 attempts, complete menu transitions and question loads within 2 seconds for at least 95% of local interactions, excluding user input time.\n\n## Acceptance criteria\n\n- [ ] Seed 1,000 questions and 10,000 attempts on a documented reference machine.\n- [ ] Measure at least 20 local menu transitions and question loads.\n- [ ] The 95th percentile is at most 2 seconds; record environment and measurements.\n\n## Planning\n\n- **Requirement:** NFR-01\n- **Priority:** Medium\n- **Estimate:** 5 story points\n- **Iteration:** Iteration 2\n\n## Verification\n\nTC-11 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:57:05Z",
+      "closed_at": "2026-11-01T05:41:31Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/12"
+    },
+    {
+      "number": 11,
+      "title": "[FR-11] Persist accounts, questions, quizzes, and completed attempts",
+      "state": "closed",
+      "assignees": [
+        "AkshathGirishShriolkar"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nSave account, question, quiz, and completed-attempt records before confirming successful creation, editing, or submission. Reload saved records after an application restart.\n\n## Acceptance criteria\n\n- [ ] Changes to each record type survive a normal restart.\n- [ ] Confirm submission only after the completed attempt is saved.\n- [ ] Report failed saves as errors rather than success.\n\n## Planning\n\n- **Requirement:** FR-11\n- **Priority:** High\n- **Estimate:** 8 story points\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-01 and TC-04, plus completed-attempt restart checks in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:56:36Z",
+      "closed_at": "2026-11-01T07:20:57Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/11"
+    },
+    {
+      "number": 10,
+      "title": "[FR-10] Display the administrator results summary",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: medium"
+      ],
+      "body": "## Description\n\nAllow authenticated administrators to view completed attempts across learners with username, quiz title, date, and score. Deny this operation to ordinary learners.\n\n## Acceptance criteria\n\n- [ ] Administrators can see completed attempts from multiple learners.\n- [ ] Include username, quiz title, date, and score.\n- [ ] Deny learner access to this operation.\n\n## Planning\n\n- **Requirement:** FR-10\n- **Priority:** Medium\n- **Estimate:** 3 story points\n- **Iteration:** Iteration 2\n\n## Verification\n\nTC-09 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:56:18Z",
+      "closed_at": "2026-11-01T05:37:21Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/10"
+    },
+    {
+      "number": 9,
+      "title": "[FR-09] Display the learner's completed result history",
+      "state": "closed",
+      "assignees": [
+        "AkshathGirishShriolkar"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nAllow learners to view only their own completed attempts, showing quiz title, date, correct count, total count, and percentage.\n\n## Acceptance criteria\n\n- [ ] Display only completed attempts belonging to the signed-in learner.\n- [ ] Include quiz title, date, correct count, total count, and percentage.\n- [ ] Exclude all attempts belonging to another learner.\n\n## Planning\n\n- **Requirement:** FR-09\n- **Priority:** High\n- **Estimate:** 3 story points\n- **Iteration:** Iteration 2\n\n## Verification\n\nTC-08 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:56:02Z",
+      "closed_at": "2026-11-01T07:20:44Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/9"
+    },
+    {
+      "number": 8,
+      "title": "[FR-08] Calculate and display quiz scores",
+      "state": "closed",
+      "assignees": [
+        "Advitha-M"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nOn submission, count stored answers matching the answer key. Award one point per correct answer with no negative marking. Display the correct count and percentage rounded to one decimal place.\n\n## Acceptance criteria\n\n- [ ] Calculate percentage as 100 × correctCount / totalQuestions, displayed to one decimal place.\n- [ ] For key A,C,B and answers A,D,B, display 2/3 and 66.7%.\n- [ ] Score a submitted attempt once and produce one completed result.\n\n## Planning\n\n- **Requirement:** FR-08\n- **Priority:** High\n- **Estimate:** 2 story points\n- **Iteration:** Iteration 2\n\n## Verification\n\nTC-07 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:55:01Z",
+      "closed_at": "2026-11-02T17:14:53Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/8"
+    },
+    {
+      "number": 7,
+      "title": "[FR-07] Recover from invalid quiz answers",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nReject answers outside A, B, C, and D, show a correction message, and re-prompt the same question without recording invalid input.\n\n## Acceptance criteria\n\n- [ ] Entering X shows an error and repeats the current question.\n- [ ] Invalid input does not advance the question or record an answer.\n- [ ] A subsequent valid answer is recorded once.\n\n## Planning\n\n- **Requirement:** FR-07\n- **Priority:** High\n- **Estimate:** 1 story point\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-06 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:54:02Z",
+      "closed_at": "2026-11-01T05:34:49Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/7"
+    },
+    {
+      "number": 6,
+      "title": "[FR-06] Implement the quiz attempt flow",
+      "state": "closed",
+      "assignees": [
+        "Advitha-M"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nPresent each configured question exactly once for the selected quiz, with choices A through D, and record one selected choice per question.\n\n## Acceptance criteria\n\n- [ ] Present every configured question exactly once in configured order.\n- [ ] Label choices A through D.\n- [ ] Record exactly one valid selected choice per question.\n\n## Planning\n\n- **Requirement:** FR-06\n- **Priority:** High\n- **Estimate:** 5 story points\n- **Iteration:** Iteration 2\n\n## Verification\n\nTC-05 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:53:21Z",
+      "closed_at": "2026-11-02T17:21:45Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/6"
+    },
+    {
+      "number": 5,
+      "title": "[FR-04] Implement administrator quiz configuration",
+      "state": "closed",
+      "assignees": [
+        "Advitha-M"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nAllow authenticated administrators to create and edit quizzes with a nonempty title and at least one active question. Reject references to unknown questions.\n\n## Acceptance criteria\n\n- [ ] Save valid quizzes with an ordered set of question IDs.\n- [ ] Reject empty titles, no active questions, and unknown question references.\n- [ ] Deny unauthorized quiz configuration.\n\n## Planning\n\n- **Requirement:** FR-04\n- **Priority:** High\n- **Estimate:** 5 story points\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-03 and TC-04 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:53:05Z",
+      "closed_at": "2026-11-02T16:39:46Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/5"
+    },
+    {
+      "number": 4,
+      "title": "[FR-03] Implement administrator question maintenance",
+      "state": "closed",
+      "assignees": [
+        "Advitha-M"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nAllow authenticated administrators to create, edit, and deactivate questions. Require a nonempty prompt, four nonempty choices, and exactly one correct choice.\n\n## Acceptance criteria\n\n- [ ] Administrators can create, edit, and deactivate questions.\n- [ ] Reject empty prompts, empty choices, an option count other than four, or an invalid answer key.\n- [ ] Unauthorized operations do not change stored data.\n\n## Planning\n\n- **Requirement:** FR-03\n- **Priority:** High\n- **Estimate:** 5 story points\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-03 and TC-04 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:52:43Z",
+      "closed_at": "2026-11-02T16:39:45Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/4"
+    },
+    {
+      "number": 3,
+      "title": "[FR-02] Implement authentication and role-specific access",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nAuthenticate registered usernames and passwords before displaying learner or administrator actions. Display a generic failure message for invalid credentials.\n\n## Acceptance criteria\n\n- [ ] Valid credentials establish a session using the stored role.\n- [ ] Actions are available only after authentication.\n- [ ] Wrong usernames and passwords produce the same generic failure.\n\n## Planning\n\n- **Requirement:** FR-02\n- **Priority:** High\n- **Estimate:** 3 story points\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-02 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:51:30Z",
+      "closed_at": "2026-11-01T05:30:22Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/3"
+    },
+    {
+      "number": 2,
+      "title": "[FR-05] Implement quiz discovery and selection",
+      "state": "closed",
+      "assignees": [
+        "AkshathGirishShriolkar"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nShow authenticated learners the available quizzes with each quiz's title, question count, and displayed identifier. Allow selection using that identifier.\n\n## Acceptance criteria\n\n- [ ] Available quizzes display a title, question count, and selectable identifier.\n- [ ] A valid identifier starts the selected quiz's attempt flow.\n- [ ] Selection is available to authenticated learners.\n\n## Planning\n\n- **Requirement:** FR-05\n- **Priority:** High\n- **Estimate:** 2 story points\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-05 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-11-01T04:49:16Z",
+      "closed_at": "2026-11-01T07:20:36Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/2"
+    },
+    {
+      "number": 1,
+      "title": "[FR-01] Implement learner account registration",
+      "state": "closed",
+      "assignees": [
+        "sickDoughnut-007"
+      ],
+      "labels": [
+        "Functional Requirement",
+        "priority: high"
+      ],
+      "body": "## Description\n\nAllow registration with a unique, nonempty username and a password of at least 8 characters. Reject duplicate usernames and invalid inputs.\n\n## Acceptance criteria\n\n- [ ] Valid registration creates one learner account.\n- [ ] Empty usernames, passwords shorter than 8 characters, and duplicate usernames are rejected.\n- [ ] Confirm success only after the account is saved.\n\n## Planning\n\n- **Requirement:** FR-01\n- **Priority:** High\n- **Estimate:** 3 story points\n- **Iteration:** Iteration 1\n\n## Verification\n\nTC-01 in Part B of the attached Deliverable 1.\n\n**Source:** Attached Deliverable 1, version 1.0, Part A.",
+      "created_at": "2026-10-31T16:20:29Z",
+      "closed_at": "2026-11-01T05:29:26Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/issues/1"
+    }
+  ],
+  "pull_requests": [
+    {
+      "number": 38,
+      "title": "Show student identity and correct answers in administrator attempt reviews",
+      "author": "sickDoughnut-007",
+      "created_at": "2026-11-07T07:43:45Z",
+      "merged_at": "2026-11-07T07:46:26Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/38",
+      "formal_reviews": []
+    },
+    {
+      "number": 37,
+      "title": "Build Quizora web learning workspace for Iteration 3",
+      "author": "sickDoughnut-007",
+      "created_at": "2026-11-07T05:56:40Z",
+      "merged_at": "2026-11-07T05:59:40Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/37",
+      "formal_reviews": []
+    },
+    {
+      "number": 31,
+      "title": "Implement question presentation and answer recording (FR-06)",
+      "author": "Advitha-M",
+      "created_at": "2026-11-02T17:21:31Z",
+      "merged_at": "2026-11-03T13:22:53Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/31",
+      "formal_reviews": []
+    },
+    {
+      "number": 30,
+      "title": "Implement quiz score calculation and submission",
+      "author": "Advitha-M",
+      "created_at": "2026-11-02T17:14:34Z",
+      "merged_at": "2026-11-03T13:22:53Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/30",
+      "formal_reviews": []
+    },
+    {
+      "number": 29,
+      "title": "Improve input guidance and retry prompts (NFR 03)",
+      "author": "Advitha-M",
+      "created_at": "2026-11-02T16:58:47Z",
+      "merged_at": "2026-11-03T13:22:53Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/29",
+      "formal_reviews": []
+    },
+    {
+      "number": 28,
+      "title": "Validate local account and result records (SEC-04)",
+      "author": "Advitha-M",
+      "created_at": "2026-11-02T16:50:54Z",
+      "merged_at": "2026-11-03T13:22:53Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/28",
+      "formal_reviews": []
+    },
+    {
+      "number": 27,
+      "title": "Implement admin quiz maintenance (FR 04)",
+      "author": "Advitha-M",
+      "created_at": "2026-11-02T16:39:07Z",
+      "merged_at": "2026-11-03T13:22:53Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/27",
+      "formal_reviews": []
+    },
+    {
+      "number": 26,
+      "title": "Implement admin question maintenance(FR-03)",
+      "author": "Advitha-M",
+      "created_at": "2026-11-02T16:09:28Z",
+      "merged_at": "2026-11-03T13:22:53Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/26",
+      "formal_reviews": []
+    },
+    {
+      "number": 25,
+      "title": "Implement Iteration 2: learner history, ownership, and storage recovery",
+      "author": "AkshathGirishShriolkar",
+      "created_at": "2026-11-01T07:12:11Z",
+      "merged_at": "2026-11-01T16:20:46Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/25",
+      "formal_reviews": []
+    },
+    {
+      "number": 24,
+      "title": "Implement Iteration 1: learner quiz flow, persistence, and admin authorization",
+      "author": "AkshathGirishShriolkar",
+      "created_at": "2026-11-01T07:06:14Z",
+      "merged_at": "2026-11-01T16:57:26Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/24",
+      "formal_reviews": []
+    },
+    {
+      "number": 23,
+      "title": "Implement Akshay's Iteration 2 results, performance, and platform requirements",
+      "author": "sickDoughnut-007",
+      "created_at": "2026-11-01T05:49:49Z",
+      "merged_at": "2026-11-01T16:21:28Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/23",
+      "formal_reviews": []
+    },
+    {
+      "number": 22,
+      "title": "Implement Akshay's Iteration 1 account and input requirements",
+      "author": "sickDoughnut-007",
+      "created_at": "2026-11-01T05:49:26Z",
+      "merged_at": "2026-11-01T16:57:45Z",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/pull/22",
+      "formal_reviews": []
+    }
+  ],
+  "latest_main_runs": [
+    {
+      "name": "Quizora web checks",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/actions/runs/44013570661",
+      "conclusion": "success",
+      "head_sha": "ad39b8fe98f699078f1a289ad46bc21d486677b3",
+      "created_at": "2026-11-17T03:55:30Z"
+    },
+    {
+      "name": "C++ build and requirements tests",
+      "url": "https://github.com/Team14OnlineQuiz/Online_quiz_system/actions/runs/44013570777",
+      "conclusion": "success",
+      "head_sha": "ad39b8fe98f699078f1a289ad46bc21d486677b3",
+      "created_at": "2026-11-17T03:55:30Z"
+    }
+  ]
+}

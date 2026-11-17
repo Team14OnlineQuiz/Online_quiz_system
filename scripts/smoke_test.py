@@ -4,7 +4,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 
-exe = Path("build/quiz.exe" if os.name == "nt" else "build/quiz").resolve()
+exe = Path(os.environ.get("QUIZ_SMOKE_EXE", "build/quiz.exe" if os.name == "nt" else "build/quiz")).resolve()
 with tempfile.TemporaryDirectory(prefix="quiz-smoke-", dir="build") as directory:
     data = Path(directory).resolve()
 

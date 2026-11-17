@@ -1,0 +1,139 @@
+{
+  "recorded_utc": "2026-11-17T04:44:15.879522+00:00",
+  "executable": "C:\\Users\\vijay\\Documents\\Codex\\2026-10-31\\https-github-com-team14onlinequiz-online-quiz\\work\\repo\\build\\quiz.exe",
+  "note": "TC-01/02/04/05/06/07/08/09 use fresh real CLI processes. Direct authorization, ownership and storage failures use the recorded executed C++ tests. TC-12 combines local execution with prior cross-platform CI evidence; Linux was not run on this Windows laptop.",
+  "results": [
+    {
+      "case": "TC-01",
+      "status": "PASS",
+      "observed": "Valid accounts persisted; repeating alex was rejected without changing the accounts file."
+    },
+    {
+      "case": "TC-02",
+      "status": "PASS",
+      "observed": "Wrong name/password used the same failure; valid login succeeded; three same-password accounts had distinct salts and no plaintext password."
+    },
+    {
+      "case": "TC-03",
+      "status": "PASS",
+      "observed": "Executed direct-service authorization unit test passed; learner CLI displayed no administrator menu."
+    },
+    {
+      "case": "TC-04",
+      "status": "PASS",
+      "observed": "Empty question prompt and unknown quiz reference were rejected; valid three-question fixture reloaded after process restart."
+    },
+    {
+      "case": "TC-05",
+      "status": "PASS",
+      "observed": "Quiz listed with three questions; each was displayed once; A,C,B produced a saved 3/3 result."
+    },
+    {
+      "case": "TC-06",
+      "status": "PASS",
+      "observed": "X repeated question 1; the valid A advanced it; subsequent questions were displayed once."
+    },
+    {
+      "case": "TC-07",
+      "status": "PASS",
+      "observed": "A,D,B against A,C,B produced exactly one completed attempt, 2/3 and 66.7%."
+    },
+    {
+      "case": "TC-08",
+      "status": "PASS",
+      "observed": "Separate learner logins returned only the respective 3/3 or 2/3 result; direct ownership-denial test passed."
+    },
+    {
+      "case": "TC-09",
+      "status": "PASS",
+      "observed": "Administrator saw both named learners; unit tests denied learner, guest, and logged-out sessions."
+    },
+    {
+      "case": "TC-10",
+      "status": "PASS",
+      "observed": "Recorded executed unit tests preserve committed files after injected write failure and reject malformed account/attempt records."
+    },
+    {
+      "case": "TC-11",
+      "status": "PASS",
+      "observed": "40 samples per operation at the planned volume: menu p95 445.705 ms; question p95 0.0187 ms; both <= 2000 ms."
+    },
+    {
+      "case": "TC-12",
+      "status": "PASS",
+      "observed": "Local Windows instrumented build and real CLI smoke passed. Previously completed main CI at the recorded source base passed Windows and Linux: https://github.com/Team14OnlineQuiz/Online_quiz_system/actions/runs/44013570777"
+    }
+  ],
+  "console_transcripts": [
+    {
+      "scenario": "Provision disposable administrator",
+      "exit_code": 0,
+      "output": "Administrator username (1-128 characters): Administrator password (at least 8 characters, at most 1024 bytes): Administrator account saved.\n"
+    },
+    {
+      "scenario": "Register learner",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Learner account saved.\nOnline Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Register learner",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Learner account saved.\nOnline Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Reject duplicate",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Username already exists.\nOnline Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Unknown username",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Invalid credentials.\nOnline Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Wrong password",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Invalid credentials.\nOnline Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Valid learner sign-in",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Learner menu\n1 Take quiz\n2 View my completed history\n3 Logout\nEnter choice (1-3; accepted choices: 1, 2, or 3): Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Reject invalid content; create three questions and quiz",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Administrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\nEnter choice (1-4; accepted choices: 1, 2, 3, or 4): \nQuestion management\n1 List questions\n2 Create question\n3 Edit question\n4 Deactivate question\n5 Back\nEnter choice (1-5): Question prompt: Choice A: Choice B: Choice C: Choice D: Correct choice (A-D): Question rejected. Use a nonempty prompt, four nonempty choices, and an answer from A-D.\n\nQuestion management\n1 List questions\n2 Create question\n3 Edit question\n4 Deactivate question\n5 Back\nEnter choice (1-5): Question prompt: Choice A: Choice B: Choice C: Choice D: Correct choice (A-D): Question created. ID: 1\n\nQuestion management\n1 List questions\n2 Create question\n3 Edit question\n4 Deactivate question\n5 Back\nEnter choice (1-5): Question prompt: Choice A: Choice B: Choice C: Choice D: Correct choice (A-D): Question created. ID: 2\n\nQuestion management\n1 List questions\n2 Create question\n3 Edit question\n4 Deactivate question\n5 Back\nEnter choice (1-5): Question prompt: Choice A: Choice B: Choice C: Choice D: Correct choice (A-D): Question created. ID: 3\n\nQuestion management\n1 List questions\n2 Create question\n3 Edit question\n4 Deactivate question\n5 Back\nEnter choice (1-5): Administrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\nEnter choice (1-4; accepted choices: 1, 2, 3, or 4): Quiz configuration\n1 List quizzes\n2 Create quiz\n3 Modify quiz\n4 Archive quiz\n5 Back\nEnter choice (1-5): Quiz title (1-120 characters): Question identifiers separated by spaces (for example: 1 2 3): Invalid data or identifier.\nQuiz configuration\n1 List quizzes\n2 Create quiz\n3 Modify quiz\n4 Archive quiz\n5 Back\nEnter choice (1-5): Quiz title (1-120 characters): Question identifiers separated by spaces (for example: 1 2 3): Changes saved.\nQuiz identifier: 1\nQuiz configuration\n1 List quizzes\n2 Create quiz\n3 Modify quiz\n4 Archive quiz\n5 Back\nEnter choice (1-5): Administrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\nEnter choice (1-4; accepted choices: 1, 2, 3, or 4): Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Reload questions and quiz",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Administrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\nEnter choice (1-4; accepted choices: 1, 2, 3, or 4): \nQuestion management\n1 List questions\n2 Create question\n3 Edit question\n4 Deactivate question\n5 Back\nEnter choice (1-5): \nQuestion ID: 1\nStatus: Active\nPrompt: Plan question 1?\nA. A option\nB. B option\nC. C option\nD. D option\nCorrect answer: A\n\nQuestion ID: 2\nStatus: Active\nPrompt: Plan question 2?\nA. A option\nB. B option\nC. C option\nD. D option\nCorrect answer: C\n\nQuestion ID: 3\nStatus: Active\nPrompt: Plan question 3?\nA. A option\nB. B option\nC. C option\nD. D option\nCorrect answer: B\n\nQuestion management\n1 List questions\n2 Create question\n3 Edit question\n4 Deactivate question\n5 Back\nEnter choice (1-5): Administrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\nEnter choice (1-4; accepted choices: 1, 2, 3, or 4): Quiz configuration\n1 List quizzes\n2 Create quiz\n3 Modify quiz\n4 Archive quiz\n5 Back\nEnter choice (1-5): 1: Acceptance fixture (3 questions)\nActive question identifiers: 1 2 3\nQuiz configuration\n1 List quizzes\n2 Create quiz\n3 Modify quiz\n4 Archive quiz\n5 Back\nEnter choice (1-5): Administrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\nEnter choice (1-4; accepted choices: 1, 2, 3, or 4): Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Known correct answer key A,C,B",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Learner menu\n1 Take quiz\n2 View my completed history\n3 Logout\nEnter choice (1-3; accepted choices: 1, 2, or 3): Available quizzes\nID | Title | Questions\n1 | Acceptance fixture | 3\nEnter quiz identifier (or press Ctrl+D/Ctrl+Z to cancel): Question 1 of 3: Plan question 1?\nA. A option\nB. B option\nC. C option\nD. D option\nChoose one answer (accepted values: A, B, C, or D): Question 2 of 3: Plan question 2?\nA. A option\nB. B option\nC. C option\nD. D option\nChoose one answer (accepted values: A, B, C, or D): Question 3 of 3: Plan question 3?\nA. A option\nB. B option\nC. C option\nD. D option\nChoose one answer (accepted values: A, B, C, or D): Attempt saved.\nQuiz: Acceptance fixture\nScore: 3/3\nPercentage: 100.0%\nLearner menu\n1 Take quiz\n2 View my completed history\n3 Logout\nEnter choice (1-3; accepted choices: 1, 2, or 3): Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Invalid X then known two-of-three answers A,D,B",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Learner menu\n1 Take quiz\n2 View my completed history\n3 Logout\nEnter choice (1-3; accepted choices: 1, 2, or 3): Available quizzes\nID | Title | Questions\n1 | Acceptance fixture | 3\nEnter quiz identifier (or press Ctrl+D/Ctrl+Z to cancel): Question 1 of 3: Plan question 1?\nA. A option\nB. B option\nC. C option\nD. D option\nChoose one answer (accepted values: A, B, C, or D): Invalid answer. Please enter exactly one uppercase letter: A, B, C, or D.\nQuestion 1 of 3: Plan question 1?\nA. A option\nB. B option\nC. C option\nD. D option\nChoose one answer (accepted values: A, B, C, or D): Question 2 of 3: Plan question 2?\nA. A option\nB. B option\nC. C option\nD. D option\nChoose one answer (accepted values: A, B, C, or D): Question 3 of 3: Plan question 3?\nA. A option\nB. B option\nC. C option\nD. D option\nChoose one answer (accepted values: A, B, C, or D): Attempt saved.\nQuiz: Acceptance fixture\nScore: 2/3\nPercentage: 66.7%\nLearner menu\n1 Take quiz\n2 View my completed history\n3 Logout\nEnter choice (1-3; accepted choices: 1, 2, or 3): Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Alex-owned history",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Learner menu\n1 Take quiz\n2 View my completed history\n3 Logout\nEnter choice (1-3; accepted choices: 1, 2, or 3): Quiz title | Date (UTC) | Score | Percentage\n\"Acceptance fixture\" | 2026-11-17T04:44:14Z | 3/3 | 100.0%\nLearner menu\n1 Take quiz\n2 View my completed history\n3 Logout\nEnter choice (1-3; accepted choices: 1, 2, or 3): Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Blair-owned history",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Learner menu\n1 Take quiz\n2 View my completed history\n3 Logout\nEnter choice (1-3; accepted choices: 1, 2, or 3): Quiz title | Date (UTC) | Score | Percentage\n\"Acceptance fixture\" | 2026-11-17T04:44:15Z | 2/3 | 66.7%\nLearner menu\n1 Take quiz\n2 View my completed history\n3 Logout\nEnter choice (1-3; accepted choices: 1, 2, or 3): Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    },
+    {
+      "scenario": "Administrator cross-learner summary",
+      "exit_code": 0,
+      "output": "Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): Username (1-128 characters): Password (at least 8 characters, at most 1024 bytes): Administrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\nEnter choice (1-4; accepted choices: 1, 2, 3, or 4): Username | Quiz title | Date (UTC) | Score | Percentage\n\"alex\" | \"Acceptance fixture\" | 2026-11-17T04:44:14Z | 3/3 | 100.0%\n\"blair\" | \"Acceptance fixture\" | 2026-11-17T04:44:15Z | 2/3 | 66.7%\nAdministrator menu\n1 Question maintenance\n2 Quiz configuration\n3 Results summary\n4 Logout\nEnter choice (1-4; accepted choices: 1, 2, 3, or 4): Online Quiz System\n1 Register learner\n2 Sign in\n3 Exit\nEnter choice (1-3; accepted choices: 1, 2, or 3): "
+    }
+  ]
+}
