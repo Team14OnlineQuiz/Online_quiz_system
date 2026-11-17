@@ -6,7 +6,7 @@ Prepared 17 November 2026 against the supplied `FOR-EVALUATORS-TheCheckList.pdf`
 
 | Evaluator item | Evidence / status |
 | --- | --- |
-| SRS in standard IEEE format | [Original SRS](../../Deliverable1/SRS.md) and [structured atomic revision](../../Deliverable1/SRS_Atomic_Revision.md). Requested content exists; exact institutional-format acceptance remains a review item. |
+| SRS in standard IEEE format | [User-story SRS](../../Deliverable1/SRS.md), [original baseline](../../Deliverable1/SRS_v1_Baseline.md), and [structured atomic revision](../../Deliverable1/SRS_Atomic_Revision.md). Requested content exists; exact institutional-format acceptance remains a review item. |
 | SRS introductory/descriptive sections | Original sections 1-3; revision sections 1-3 |
 | Clear measurable FRs/NFRs | Original 11 FRs/four NFRs; atomic child statements preserve IDs; NFR-01 has workload, p95 and two-second limit |
 | At least one UML use-case diagram | SRS section 7; original diagram preserved |

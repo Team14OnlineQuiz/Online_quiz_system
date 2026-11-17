@@ -9,7 +9,7 @@ Team 14's project supports student quiz practice and teacher assessment. This pa
 | Line, branch, and function coverage | [Coverage summary below](#test-results-and-coverage) and [full report index](docs/reports/README.md) |
 | Test cases with actual observations | [Expected versus actual results](Deliverable1/Test_Cases.md) |
 | Before and after test plans | [Before testing](Deliverable1/Test_Plan_v1_Before.md) / [After testing](Deliverable1/Test_Plan_v2_After.md) |
-| Requirements | [Original SRS](Deliverable1/SRS.md) / [Atomic revision](Deliverable1/SRS_Atomic_Revision.md) |
+| Requirements | [User-story SRS](Deliverable1/SRS.md) / [Atomic user stories](Deliverable1/SRS_Atomic_Revision.md) / [Original baseline](Deliverable1/SRS_v1_Baseline.md) |
 | Architecture and diagrams | [Console SAD](Deliverable1/SAD.md) / [Website architecture](Deliverable1/SAD_Web_Addendum.md) |
 | Sprint videos | [Sprint 1: one minute](docs/videos/sprint-1.mp4) / [Sprint 2: two minutes](docs/videos/sprint-2.mp4) |
 | Evaluation checklist | [Evidence index](docs/evaluation/README.md) |

@@ -8,7 +8,7 @@ TP-QUIZ-1.1 updates the original version 1.0 plan after sprint integration and t
 
 ## 2 Test items and references
 
-Items: console executable, authentication, authoring, quiz flow, scoring, history, repositories, and the Flask web API. References: [original SRS](SRS.md), [atomic revision](SRS_Atomic_Revision.md), [console SAD](SAD.md), [web SAD](SAD_Web_Addendum.md), and [backlog mapping](../docs/evaluation/backlog-traceability.md). The baseline production source is commit `ad39b8f`; evidence-preparation changes add reporting and an optional smoke executable path, without changing production application source.
+Items: console executable, authentication, authoring, quiz flow, scoring, history, repositories, and the Flask web API. References: [original SRS](SRS_v1_Baseline.md), [user-story SRS](SRS.md), [atomic revision](SRS_Atomic_Revision.md), [console SAD](SAD.md), [web SAD](SAD_Web_Addendum.md), and [backlog mapping](../docs/evaluation/backlog-traceability.md). The baseline production source is commit `ad39b8f`; evidence-preparation changes add reporting and an optional smoke executable path, without changing production application source.
 
 ## 3 Features to be tested
 
