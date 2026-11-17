@@ -2,6 +2,8 @@
 
 ## Project documents
 
+Start with the [evaluator checklist and evidence index](docs/evaluation/README.md), [40-45 minute walkthrough](docs/evaluation/walkthrough.md), [test and coverage reports](docs/reports/README.md), and [Sprint 1/Sprint 2 videos](docs/videos/README.md).
+
 Deliverable 1 is available in separate files: [SRS](Deliverable1/SRS.md), [test cases](Deliverable1/Test_Cases.md), and [architecture and design specification (SAD)](Deliverable1/SAD.md). These preserve the original console baseline. See the [document index](Deliverable1/README.md) for scope and the original source, and the [presentation guide](docs/presentation-guide.md) for the current website demo and individual contributions.
 
 ## Web application — Iteration 3
